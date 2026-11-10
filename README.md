@@ -2,8 +2,8 @@
 Your project's description...
 
 ## Environments
-- Preview: https://main--{repo}--{owner}.aem.page/
-- Live: https://main--{repo}--{owner}.aem.live/
+- Preview: https://main--rwjf-eds--vhosamath.aem.page/
+- Live: https://main--rwjf-eds--vhosamath.aem.live/
 
 ## Documentation
 
