@@ -21,6 +21,61 @@
           "name": "keywords",
           "multi": true,
           "label": "Keywords"
+        },
+        {
+          "component": "select",
+          "valueType": "string",
+          "name": "template",
+          "label": "Template",
+          "options": [
+            {
+              "name": "Default",
+              "value": ""
+            },
+            {
+              "name": "Article",
+              "value": "article"
+            }
+          ]
+        },
+        {
+          "component": "reference",
+          "valueType": "string",
+          "name": "image",
+          "label": "Social Image",
+          "multi": false
+        },
+        {
+          "component": "text",
+          "valueType": "string",
+          "name": "byline",
+          "label": "Byline",
+          "description": "Shown under the article title, e.g. \"A message from …\""
+        },
+        {
+          "component": "text",
+          "valueType": "string",
+          "name": "author",
+          "label": "Author"
+        },
+        {
+          "component": "text",
+          "valueType": "string",
+          "name": "content-type",
+          "label": "Content Type",
+          "description": "Label shown in the article header, e.g. \"RWJF Annual Message\""
+        },
+        {
+          "component": "date-time",
+          "valueType": "date",
+          "name": "publication-date",
+          "label": "Publication Date"
+        },
+        {
+          "component": "number",
+          "valueType": "number",
+          "name": "read-time",
+          "label": "Read Time (minutes)"
         }
       ]
     }

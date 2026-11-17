@@ -1,0 +1,62 @@
+.breadcrumb {
+  --breadcrumb-link: #af45c9;
+
+  padding: 16px 0 0;
+}
+
+.breadcrumb ol {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: var(--body-font-size-s);
+  line-height: 1.4;
+}
+
+.breadcrumb li {
+  display: inline-flex;
+  align-items: center;
+}
+
+.breadcrumb li + li::before {
+  content: '';
+  display: inline-block;
+  width: 0.4em;
+  height: 0.4em;
+  margin: 0 0.75em 0 0.5em;
+  border-top: 2px solid currentcolor;
+  border-right: 2px solid currentcolor;
+  transform: rotate(45deg);
+}
+
+.breadcrumb a:any-link {
+  color: var(--breadcrumb-link);
+}
+
+.breadcrumb [aria-current='page'] {
+  font-weight: 400;
+}
+
+/* on small screens show only the parent link as a "back" link */
+@media (width < 600px) {
+  .breadcrumb li:not(:nth-last-child(2)) {
+    display: none;
+  }
+
+  .breadcrumb li + li::before {
+    display: none;
+  }
+
+  .breadcrumb li:nth-last-child(2)::before {
+    content: '';
+    display: inline-block;
+    width: 0.4em;
+    height: 0.4em;
+    margin-right: 0.6em;
+    border-bottom: 2px solid currentcolor;
+    border-left: 2px solid currentcolor;
+    transform: rotate(45deg);
+  }
+}

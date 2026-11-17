@@ -33,6 +33,10 @@
             {
               "name": "Highlight",
               "value": "highlight"
+            },
+            {
+              "name": "Aside (last block in right rail)",
+              "value": "aside"
             }
           ]
         }
@@ -50,7 +54,10 @@
         "hero",
         "cards",
         "columns",
-        "fragment"
+        "fragment",
+        "breadcrumb",
+        "quote",
+        "callout"
       ]
     }
   ]

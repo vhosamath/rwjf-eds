@@ -21,6 +21,18 @@
       "id": "hero",
       "fields": [
         {
+          "component": "multiselect",
+          "name": "classes",
+          "label": "Style",
+          "valueType": "string",
+          "options": [
+            {
+              "name": "Article header (no image, shows byline, content type, date and read time from page metadata)",
+              "value": "article"
+            }
+          ]
+        },
+        {
           "component": "reference",
           "valueType": "string",
           "name": "image",
