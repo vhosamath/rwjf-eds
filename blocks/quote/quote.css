@@ -1,13 +1,11 @@
 .quote {
-  --quote-accent: #af45c9;
-
-  margin: 40px 0;
+  margin: var(--section-spacing) 0;
 }
 
 .quote .quote-figure {
   margin: 0;
   padding-left: 24px;
-  border-left: 4px solid var(--quote-accent);
+  border-left: 4px solid var(--color-purple);
 }
 
 .quote .quote-quotation {
@@ -17,8 +15,8 @@
 .quote .quote-quotation p {
   margin: 0;
   font-family: var(--heading-font-family);
-  font-size: var(--heading-font-size-m);
-  font-weight: 500;
+  font-size: var(--quote-font-size);
+  font-weight: var(--heading-font-weight);
   line-height: 1.1;
 }
 
@@ -31,9 +29,5 @@
 @media (width >= 900px) {
   .quote .quote-figure {
     padding-left: 28px;
-  }
-
-  .quote .quote-quotation p {
-    font-size: 30px;
   }
 }
