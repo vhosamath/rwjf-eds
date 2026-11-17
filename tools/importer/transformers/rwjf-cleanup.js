@@ -194,6 +194,19 @@ export default function transform(hookName, element, payload) {
     // default content fixes
     const content = main.querySelector('#main-content') || main;
     fixDefaultContentHeadings(content);
+    // standalone AEM button components in default content (e.g. "Download annual message") become
+    // an em-wrapped link, which EDS decorates as a text-style (secondary) button with an arrow
+    content.querySelectorAll('.button.aem-GridColumn a.cmp-button__link[href]').forEach((btn) => {
+      if (btn.closest('.news-floating-cta, .cmp-modal, .cmp-hero')) return;
+      const p = doc.createElement('p');
+      const em = doc.createElement('em');
+      const a = doc.createElement('a');
+      a.setAttribute('href', btn.getAttribute('href'));
+      a.textContent = (btn.textContent || '').replace(/\s+/g, ' ').trim();
+      em.append(a);
+      p.append(em);
+      (btn.closest('.button.aem-GridColumn') || btn).replaceWith(p);
+    });
     content.querySelectorAll('.cmp-text').forEach((text) => {
       stripHeadingBreaks(text);
       removeEmptyInlineAndParagraphs(text);

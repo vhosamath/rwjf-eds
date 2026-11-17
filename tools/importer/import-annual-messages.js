@@ -60,8 +60,7 @@ const PAGE_TEMPLATE = {
       "name": "Breadcrumb and article hero",
       "selector": [
         "#main-content > div.column-control.responsivegrid:nth-of-type(1)",
-        "#main-content > div.hero",
-        "#main-content > div.column-control.responsivegrid:nth-of-type(3) .column-control__grid > .column-control__col:nth-of-type(1)"
+        "#main-content > div.hero"
       ],
       "style": null,
       "blocks": [
@@ -72,8 +71,9 @@ const PAGE_TEMPLATE = {
     },
     {
       "id": "section-2",
-      "name": "Introduction: Weaving the Threads of Health / Innovation / Taking Action / Areas of Focus",
+      "name": "Intro: download link left, Weaving the Threads of Health right / Innovation / Taking Action / Areas of Focus",
       "selector": [
+        "#main-content > div.column-control.responsivegrid:nth-of-type(3) .column-control__grid > .column-control__col:nth-of-type(1)",
         "#main-content > div.column-control.responsivegrid:nth-of-type(3) .column-control__grid > .column-control__col:nth-of-type(2)",
         "#main-content > div.column-control.responsivegrid:nth-of-type(4)",
         "#main-content > div.column-control.responsivegrid:nth-of-type(5)",
@@ -82,7 +82,7 @@ const PAGE_TEMPLATE = {
         "#main-content > div.column-control.responsivegrid:nth-of-type(8)",
         "#main-content > div.column-control.responsivegrid:nth-of-type(9)"
       ],
-      "style": null,
+      "style": "intro",
       "blocks": [
         "quote-wide"
       ],

@@ -36,15 +36,16 @@
   }
 }
 
-/* article header variant: no image, title + byline + article info + download link */
+/* article header variant: no image, title + byline + article info (from page metadata) */
 .hero-container .hero-wrapper:has(.hero.article) {
   max-width: var(--content-max-width);
   padding: 0 var(--content-padding);
 }
 
+/* 40px (mobile) / 48px (desktop) between the breadcrumb and the title, as on the source */
 .hero.article {
   min-height: 0;
-  padding: 24px 0 8px;
+  padding: 40px 0 64px;
 }
 
 .hero.article > .hero-empty {
@@ -70,16 +71,27 @@
 .hero.article .hero-info {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px 24px;
+  gap: 0;
   margin: 40px 0 0;
   font-size: var(--button-font-size);
   font-weight: 700;
   line-height: 1.2;
 }
 
+/* "|" separators between content type, date and read time (hidden from screen readers) */
+.hero.article .hero-info > span + span::before {
+  content: '|' / '';
+  padding: 0 16px;
+  color: var(--color-gray);
+}
+
+/* older content may still carry the download link inside the hero */
 .hero.article .hero-download:any-link {
+  position: relative;
+  display: inline-block;
+  padding-right: 24px;
   color: var(--text-color);
-  font-size: var(--button-font-size);
+  font-size: var(--cta-link-font-size);
   font-weight: 700;
   letter-spacing: -0.01em;
   text-decoration: none;
@@ -93,17 +105,24 @@
 
 .hero.article .hero-download::after {
   content: '';
-  display: inline-block;
-  width: 0.5em;
-  height: 0.5em;
-  margin-left: 0.5em;
-  border-right: 2px solid currentcolor;
-  border-bottom: 2px solid currentcolor;
-  transform: translateY(-0.15em) rotate(45deg);
+  position: absolute;
+  top: 50%;
+  right: 0;
+  width: 14px;
+  height: 14px;
+  background-color: var(--color-purple);
+  mask: var(--icon-arrow-right) center / contain no-repeat;
+  transform: translateY(-50%);
 }
 
 @media (width >= 900px) {
   .hero.article {
-    padding: 40px 0 16px;
+    padding: 48px 0 72px;
+  }
+
+  /* the source title and byline wrap at 75% of the content width (900px of 1200px) */
+  .hero.article h1,
+  .hero.article .hero-byline {
+    max-width: 75%;
   }
 }
