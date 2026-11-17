@@ -195,6 +195,10 @@
           {
             "name": "Aside (last block in right rail)",
             "value": "aside"
+          },
+          {
+            "name": "Intro (first link left, heading + lead line right)",
+            "value": "intro"
           }
         ]
       }

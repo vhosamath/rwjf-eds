@@ -16,6 +16,12 @@
   --color-purple: #af45c9;
   --color-cream: #fdfdf9;
   --color-gray-light: #f2f4f5;
+  --color-slate: #587482;
+  --color-gray: #abb9c0;
+
+  /* icons (source: rwjf.org), used as CSS masks */
+  --icon-arrow-right: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 14 14'%3E%3Cpath fill='%23AF45C9' d='M0 6h10.959L6.373 1.414 7.787 0l5.657 5.657a1.9 1.9 0 0 1 0 2.686L7.787 14l-1.414-1.414L10.959 8H0V6Z'/%3E%3C/svg%3E");
+  --icon-chevron-right: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='14' viewBox='0 0 8 14' fill='none'%3E%3Cpath d='M1 1L6.29289 6.29289C6.68342 6.68342 6.68342 7.31658 6.29289 7.70711L1 13' stroke='%23C0C8CC' stroke-width='2' stroke-miterlimit='16'/%3E%3C/svg%3E");
 
   /* colors */
   --background-color: var(--color-cream);
@@ -41,6 +47,7 @@
   --body-line-height: 1.5;
   --caption-font-size: 12px;
   --button-font-size: 18px;
+  --cta-link-font-size: 16px;
   --byline-font-size: 25px;
   --quote-font-size: 26px;
 
@@ -294,13 +301,14 @@ button.button.primary:disabled:focus-visible {
   color: var(--dark-color);
 }
 
-/* secondary: text-style call to action with an arrow, underlined on hover */
+/* secondary: text-style call to action (source tertiary/secondary CTA): 16px bold text + purple arrow */
 a.button.secondary,
 button.button.secondary {
   position: relative;
   border: 0;
   border-radius: 0;
   padding: 0 24px 0 0;
+  font-size: var(--cta-link-font-size);
   background-color: transparent;
   color: var(--text-color);
   overflow: visible;
@@ -311,12 +319,12 @@ button.button.secondary::after {
   content: '';
   position: absolute;
   top: 50%;
-  right: 4px;
-  width: 8px;
-  height: 8px;
-  border-top: 2px solid currentcolor;
-  border-right: 2px solid currentcolor;
-  transform: translateY(-50%) rotate(45deg);
+  right: 0;
+  width: 14px;
+  height: 14px;
+  background-color: var(--color-purple);
+  mask: var(--icon-arrow-right) center / contain no-repeat;
+  transform: translateY(-50%);
   transition: transform 0.2s;
 }
 
@@ -332,7 +340,12 @@ button.button.secondary:focus-visible {
 
 a.button.secondary:hover::after,
 button.button.secondary:hover::after {
-  transform: translate(4px, -50%) rotate(45deg);
+  transform: translate(4px, -50%);
+}
+
+a.button.secondary:active::after,
+button.button.secondary:active::after {
+  opacity: 0.5;
 }
 
 a.button.secondary[aria-disabled="true"],
@@ -414,10 +427,7 @@ main .section.highlight {
   padding: 40px 0;
 }
 
-/* article template: single reading track with an optional right rail (section style "aside") */
-body.article main > .section > .default-content-wrapper > * {
-  max-width: var(--article-main-width);
-}
+/* article template: full-width 12-column track (1200px) with an optional right rail (section style "aside") */
 
 /* topics that share a section keep the source's row spacing above each H2 */
 body.article main .default-content-wrapper > h2:not(:first-child) {
@@ -426,6 +436,18 @@ body.article main .default-content-wrapper > h2:not(:first-child) {
 
 main > .section.aside > div:last-child:not(.default-content-wrapper) {
   margin-top: var(--section-spacing);
+}
+
+/*
+ * section style "intro": the first paragraph (e.g. a download link) sits in a narrow left column
+ * (span 4) next to the first H2 and its lead line (span 8); everything after spans the full width.
+ */
+main > .section.intro > .default-content-wrapper:first-child > p:first-child + h2 {
+  margin-top: calc(var(--section-spacing) + 24px);
+}
+
+main > .section.intro > .default-content-wrapper:first-child > p:first-child {
+  margin: 0 0 16px;
 }
 
 @media (width >= 900px) {
@@ -446,10 +468,39 @@ main > .section.aside > div:last-child:not(.default-content-wrapper) {
     padding: 0;
   }
 
+  /* the rail starts at the top of the text column, 16px above the H2 text, as on the source */
   main > .section.aside > div:last-child:not(.default-content-wrapper) {
     grid-column: 2;
     grid-row: 1 / span 20;
     align-self: start;
+    margin-top: 0;
+  }
+
+  main > .section.intro > .default-content-wrapper:first-child {
+    display: grid;
+    grid-template-columns: min(var(--article-rail-width), 33%) minmax(0, 1fr);
+    column-gap: var(--column-gap);
+  }
+
+  main > .section.intro > .default-content-wrapper:first-child > * {
+    grid-column: 1 / -1;
+  }
+
+  main > .section.intro > .default-content-wrapper:first-child > p:first-child {
+    grid-column: 1;
+    grid-row: 1 / span 2;
+    align-self: start;
+    margin: 0;
+  }
+
+  main > .section.intro > .default-content-wrapper:first-child > p:first-child + h2 {
+    grid-column: 2;
+    grid-row: 1;
     margin-top: 16px;
+  }
+
+  main > .section.intro > .default-content-wrapper:first-child > p:first-child + h2 + h3 {
+    grid-column: 2;
+    grid-row: 2;
   }
 }
