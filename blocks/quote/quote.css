@@ -1,0 +1,39 @@
+.quote {
+  --quote-accent: #af45c9;
+
+  margin: 40px 0;
+}
+
+.quote .quote-figure {
+  margin: 0;
+  padding-left: 24px;
+  border-left: 4px solid var(--quote-accent);
+}
+
+.quote .quote-quotation {
+  margin: 0;
+}
+
+.quote .quote-quotation p {
+  margin: 0;
+  font-family: var(--heading-font-family);
+  font-size: var(--heading-font-size-m);
+  font-weight: 500;
+  line-height: 1.1;
+}
+
+.quote .quote-attribution {
+  margin-top: 16px;
+  font-size: var(--body-font-size-xs);
+  font-weight: 700;
+}
+
+@media (width >= 900px) {
+  .quote .quote-figure {
+    padding-left: 28px;
+  }
+
+  .quote .quote-quotation p {
+    font-size: 30px;
+  }
+}

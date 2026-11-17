@@ -1,0 +1,112 @@
+{
+  "definitions": [
+    {
+      "title": "Callout",
+      "id": "callout",
+      "plugins": {
+        "xwalk": {
+          "page": {
+            "resourceType": "core/franklin/components/block/v1/block",
+            "template": {
+              "name": "Callout",
+              "model": "callout",
+              "classes": "card",
+              "content_titleType": "h3"
+            }
+          }
+        }
+      }
+    }
+  ],
+  "models": [
+    {
+      "id": "callout",
+      "fields": [
+        {
+          "component": "select",
+          "name": "classes",
+          "label": "Style",
+          "valueType": "string",
+          "value": "card",
+          "options": [
+            {
+              "name": "Card",
+              "value": "card"
+            },
+            {
+              "name": "Figure (image with caption)",
+              "value": "figure"
+            }
+          ]
+        },
+        {
+          "component": "reference",
+          "valueType": "string",
+          "name": "media_image",
+          "label": "Image",
+          "multi": false
+        },
+        {
+          "component": "text",
+          "valueType": "string",
+          "name": "media_imageAlt",
+          "label": "Image Alt Text"
+        },
+        {
+          "component": "text",
+          "valueType": "string",
+          "name": "content_title",
+          "label": "Title"
+        },
+        {
+          "component": "select",
+          "valueType": "string",
+          "name": "content_titleType",
+          "label": "Title Type",
+          "value": "h3",
+          "options": [
+            {
+              "name": "h2",
+              "value": "h2"
+            },
+            {
+              "name": "h3",
+              "value": "h3"
+            },
+            {
+              "name": "h4",
+              "value": "h4"
+            }
+          ]
+        },
+        {
+          "component": "richtext",
+          "valueType": "string",
+          "name": "content_text",
+          "label": "Text"
+        },
+        {
+          "component": "aem-content",
+          "valueType": "string",
+          "name": "cta_link",
+          "label": "Link",
+          "description": "Page or URL. A YouTube link opens the video in a dialog."
+        },
+        {
+          "component": "text",
+          "valueType": "string",
+          "name": "cta_linkText",
+          "label": "Link Text"
+        },
+        {
+          "component": "richtext",
+          "valueType": "string",
+          "name": "cta_dialog",
+          "label": "Video Dialog Text",
+          "description": "Optional. Shown under the video when the link is a YouTube URL."
+        }
+      ]
+    }
+  ],
+  "filters": []
+}

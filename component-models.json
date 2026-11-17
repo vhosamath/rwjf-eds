@@ -20,6 +20,61 @@
         "name": "keywords",
         "multi": true,
         "label": "Keywords"
+      },
+      {
+        "component": "select",
+        "valueType": "string",
+        "name": "template",
+        "label": "Template",
+        "options": [
+          {
+            "name": "Default",
+            "value": ""
+          },
+          {
+            "name": "Article",
+            "value": "article"
+          }
+        ]
+      },
+      {
+        "component": "reference",
+        "valueType": "string",
+        "name": "image",
+        "label": "Social Image",
+        "multi": false
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "byline",
+        "label": "Byline",
+        "description": "Shown under the article title, e.g. \"A message from …\""
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "author",
+        "label": "Author"
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "content-type",
+        "label": "Content Type",
+        "description": "Label shown in the article header, e.g. \"RWJF Annual Message\""
+      },
+      {
+        "component": "date-time",
+        "valueType": "date",
+        "name": "publication-date",
+        "label": "Publication Date"
+      },
+      {
+        "component": "number",
+        "valueType": "number",
+        "name": "read-time",
+        "label": "Read Time (minutes)"
       }
     ]
   },
@@ -136,8 +191,112 @@
           {
             "name": "Highlight",
             "value": "highlight"
+          },
+          {
+            "name": "Aside (last block in right rail)",
+            "value": "aside"
           }
         ]
+      }
+    ]
+  },
+  {
+    "id": "breadcrumb",
+    "fields": [
+      {
+        "component": "richtext",
+        "valueType": "string",
+        "name": "items",
+        "label": "Breadcrumb Items",
+        "description": "Ordered list of parent page links; the last item is the current page. Leave empty to build the trail from the page URL."
+      }
+    ]
+  },
+  {
+    "id": "callout",
+    "fields": [
+      {
+        "component": "select",
+        "name": "classes",
+        "label": "Style",
+        "valueType": "string",
+        "value": "card",
+        "options": [
+          {
+            "name": "Card",
+            "value": "card"
+          },
+          {
+            "name": "Figure (image with caption)",
+            "value": "figure"
+          }
+        ]
+      },
+      {
+        "component": "reference",
+        "valueType": "string",
+        "name": "media_image",
+        "label": "Image",
+        "multi": false
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "media_imageAlt",
+        "label": "Image Alt Text"
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "content_title",
+        "label": "Title"
+      },
+      {
+        "component": "select",
+        "valueType": "string",
+        "name": "content_titleType",
+        "label": "Title Type",
+        "value": "h3",
+        "options": [
+          {
+            "name": "h2",
+            "value": "h2"
+          },
+          {
+            "name": "h3",
+            "value": "h3"
+          },
+          {
+            "name": "h4",
+            "value": "h4"
+          }
+        ]
+      },
+      {
+        "component": "richtext",
+        "valueType": "string",
+        "name": "content_text",
+        "label": "Text"
+      },
+      {
+        "component": "aem-content",
+        "valueType": "string",
+        "name": "cta_link",
+        "label": "Link",
+        "description": "Page or URL. A YouTube link opens the video in a dialog."
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "cta_linkText",
+        "label": "Link Text"
+      },
+      {
+        "component": "richtext",
+        "valueType": "string",
+        "name": "cta_dialog",
+        "label": "Video Dialog Text",
+        "description": "Optional. Shown under the video when the link is a YouTube URL."
       }
     ]
   },
@@ -193,6 +352,18 @@
     "id": "hero",
     "fields": [
       {
+        "component": "multiselect",
+        "name": "classes",
+        "label": "Style",
+        "valueType": "string",
+        "options": [
+          {
+            "name": "Article header (no image, shows byline, content type, date and read time from page metadata)",
+            "value": "article"
+          }
+        ]
+      },
+      {
         "component": "reference",
         "valueType": "string",
         "name": "image",
@@ -212,6 +383,35 @@
         "value": "",
         "label": "Text",
         "valueType": "string"
+      }
+    ]
+  },
+  {
+    "id": "quote",
+    "fields": [
+      {
+        "component": "multiselect",
+        "name": "classes",
+        "label": "Style",
+        "valueType": "string",
+        "options": [
+          {
+            "name": "Wide (breaks out of the article column)",
+            "value": "wide"
+          }
+        ]
+      },
+      {
+        "component": "richtext",
+        "valueType": "string",
+        "name": "quotation",
+        "label": "Quotation"
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "attribution",
+        "label": "Attribution"
       }
     ]
   }

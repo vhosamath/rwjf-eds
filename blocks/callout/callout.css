@@ -1,0 +1,182 @@
+/* callout: right-rail card or captioned figure */
+.callout {
+  --callout-accent: #af45c9;
+  --callout-card-bg: #f2f4f5;
+  --callout-text: #042e43;
+
+  color: var(--callout-text);
+}
+
+.callout .callout-media p {
+  margin: 0;
+}
+
+.callout .callout-media picture,
+.callout .callout-media img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.callout .callout-content > :first-child {
+  margin-top: 0;
+}
+
+.callout .callout-content > :last-child {
+  margin-bottom: 0;
+}
+
+.callout .callout-title {
+  margin: 0;
+  font-size: var(--heading-font-size-s);
+  font-weight: 500;
+  line-height: 1;
+}
+
+.callout .callout-content p {
+  margin: 12px 0 0;
+  font-size: var(--body-font-size-xs);
+  line-height: 1.4;
+}
+
+/* card */
+.callout.card {
+  overflow: hidden;
+  border-radius: 24px;
+  background-color: var(--callout-card-bg);
+}
+
+.callout.card .callout-media img {
+  aspect-ratio: 3 / 2;
+  object-fit: cover;
+}
+
+.callout.card .callout-content,
+.callout.card .callout-cta {
+  padding: 24px 24px 0;
+}
+
+.callout.card > :last-child:not(dialog),
+.callout.card > :has(+ dialog) {
+  padding-bottom: 24px;
+}
+
+.callout .callout-cta p.button-wrapper {
+  margin: 0;
+}
+
+.callout .callout-cta .button.primary {
+  border-color: var(--callout-accent);
+  background-color: var(--callout-accent);
+  color: #fff;
+  font-weight: 700;
+  border-radius: 96px;
+  white-space: normal;
+}
+
+.callout .callout-cta .button.primary:hover,
+.callout .callout-cta .button.primary:focus-visible {
+  border-color: var(--callout-text);
+  background-color: var(--callout-text);
+  color: #fff;
+}
+
+/* figure */
+.callout.figure .callout-figure {
+  margin: 0;
+}
+
+.callout.figure .callout-caption .callout-title {
+  margin: 16px 0;
+  font-size: var(--heading-font-size-l);
+}
+
+.callout.figure .callout-caption p {
+  margin: 0 0 16px;
+  font-size: 12px;
+  line-height: 1.3;
+}
+
+/* video dialog */
+.callout .callout-dialog {
+  box-sizing: border-box;
+  width: min(900px, calc(100vw - 32px));
+  max-height: calc(100vh - 32px);
+  padding: 24px;
+  border: 0;
+  border-radius: 16px;
+  background-color: #fff;
+  color: var(--callout-text);
+}
+
+.callout .callout-dialog::backdrop {
+  background-color: rgb(4 46 67 / 80%);
+}
+
+.callout .callout-dialog-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.callout .callout-dialog-title {
+  margin: 0;
+  font-size: var(--heading-font-size-m);
+}
+
+.callout .callout-dialog-close {
+  position: relative;
+  flex: 0 0 auto;
+  width: 40px;
+  height: 40px;
+  border: 0;
+  border-radius: 50%;
+  background-color: var(--callout-card-bg);
+  cursor: pointer;
+}
+
+.callout .callout-dialog-close::before,
+.callout .callout-dialog-close::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 18px;
+  height: 2px;
+  background-color: var(--callout-text);
+  transform: translate(-50%, -50%) rotate(45deg);
+}
+
+.callout .callout-dialog-close::after {
+  transform: translate(-50%, -50%) rotate(-45deg);
+}
+
+.callout .callout-dialog-close:focus-visible {
+  outline: 2px solid var(--callout-accent);
+  outline-offset: 2px;
+}
+
+.callout .callout-dialog-video {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  background-color: #000;
+}
+
+.callout .callout-dialog-video iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+.callout .callout-dialog .callout-dialog-text p {
+  margin: 16px 0 0;
+  font-size: var(--body-font-size-s);
+}
+
+body.callout-dialog-open {
+  overflow: hidden;
+}
