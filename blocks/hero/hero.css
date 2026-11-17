@@ -38,8 +38,8 @@
 
 /* article header variant: no image, title + byline + article info + download link */
 .hero-container .hero-wrapper:has(.hero.article) {
-  max-width: 1200px;
-  padding: 0 24px;
+  max-width: var(--content-max-width);
+  padding: 0 var(--content-padding);
 }
 
 .hero.article {
@@ -51,19 +51,19 @@
   display: none;
 }
 
+/* the source article title uses the H2 size, not the 86px H1 */
 .hero.article h1 {
   margin: 0;
   max-width: none;
   color: inherit;
-  font-size: clamp(40px, 4.7vw, 60px);
-  font-weight: 500;
-  line-height: 1;
+  font-size: var(--heading-font-size-xl);
+  line-height: var(--heading-line-height-xl);
 }
 
 .hero.article .hero-byline {
   margin: 24px 0 0;
   font-family: var(--heading-font-family);
-  font-size: var(--heading-font-size-s);
+  font-size: var(--byline-font-size);
   line-height: 1.1;
 }
 
@@ -72,14 +72,23 @@
   flex-wrap: wrap;
   gap: 8px 24px;
   margin: 40px 0 0;
-  font-size: var(--body-font-size-xs);
+  font-size: var(--button-font-size);
   font-weight: 700;
   line-height: 1.2;
 }
 
-.hero.article .hero-download {
+.hero.article .hero-download:any-link {
+  color: var(--text-color);
+  font-size: var(--button-font-size);
   font-weight: 700;
-  color: inherit;
+  letter-spacing: -0.01em;
+  text-decoration: none;
+}
+
+.hero.article .hero-download:hover,
+.hero.article .hero-download:focus-visible {
+  text-decoration: underline 2px var(--color-purple);
+  text-underline-offset: 4px;
 }
 
 .hero.article .hero-download::after {
@@ -94,11 +103,6 @@
 }
 
 @media (width >= 900px) {
-  .hero-container .hero-wrapper:has(.hero.article) {
-    max-width: 1280px;
-    padding: 0 40px;
-  }
-
   .hero.article {
     padding: 40px 0 16px;
   }

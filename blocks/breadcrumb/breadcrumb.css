@@ -1,6 +1,4 @@
 .breadcrumb {
-  --breadcrumb-link: #af45c9;
-
   padding: 16px 0 0;
 }
 
@@ -11,7 +9,7 @@
   margin: 0;
   padding: 0;
   list-style: none;
-  font-size: var(--body-font-size-s);
+  font-size: var(--body-font-size-m);
   line-height: 1.4;
 }
 
@@ -32,7 +30,12 @@
 }
 
 .breadcrumb a:any-link {
-  color: var(--breadcrumb-link);
+  color: var(--link-color);
+  text-decoration: none;
+}
+
+.breadcrumb a:hover {
+  text-decoration: underline;
 }
 
 .breadcrumb [aria-current='page'] {
