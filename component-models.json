@@ -395,6 +395,47 @@
     ]
   },
   {
+    "id": "newsletter",
+    "fields": [
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "heading",
+        "label": "Heading",
+        "value": "Stay informed"
+      },
+      {
+        "component": "richtext",
+        "valueType": "string",
+        "name": "intro",
+        "label": "Intro text",
+        "value": "<p>Sign up for the latest funding alerts, news, research, and perspectives from RWJF.</p>"
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "endpoint",
+        "label": "Endpoint URL",
+        "description": "Subscription servlet that receives the check/add requests. Enter \"mock\" to test the form without sending anything.",
+        "value": "https://dev-sp3.rwjf.cloud/action/servlets/subscription"
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "siteKey",
+        "label": "reCAPTCHA v3 site key",
+        "value": "6Ld7dqorAAAAAIAefIumXAPxDqaVBd4luMMHmi1w"
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "successHeading",
+        "label": "Success heading",
+        "value": "Subscribed!"
+      }
+    ]
+  },
+  {
     "id": "quote",
     "fields": [
       {

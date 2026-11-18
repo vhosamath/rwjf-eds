@@ -1,0 +1,373 @@
+/* RWJF "Stay informed" signup (source: rwjf.org) */
+.newsletter {
+  --newsletter-lavender: #efdaf4;
+  --newsletter-field-border: var(--color-gray);
+
+  color: var(--color-navy);
+}
+
+.newsletter form {
+  margin: 0;
+}
+
+.newsletter h2,
+.newsletter h3,
+.newsletter p {
+  margin: 0;
+}
+
+/* band */
+.newsletter .newsletter-band {
+  display: grid;
+  gap: 40px;
+  border-radius: 64px 0;
+  padding: 24px 32px 34px;
+  background-color: var(--newsletter-lavender);
+}
+
+.newsletter .newsletter-band.is-expanded {
+  border-radius: 64px 64px 0 0;
+}
+
+.newsletter .newsletter-intro h2 {
+  margin-top: 16px;
+  font-family: var(--heading-font-family);
+  font-size: var(--heading-font-size-xl);
+  font-weight: 500;
+  line-height: 1;
+}
+
+.newsletter .newsletter-intro-text p {
+  margin-top: 16px;
+  font-family: var(--body-font-family);
+  font-size: var(--byline-font-size);
+  line-height: 1.1;
+}
+
+/* fields */
+.newsletter .newsletter-field label,
+.newsletter legend {
+  display: block;
+  margin-bottom: 10px;
+  padding: 0;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.newsletter input[type='text'],
+.newsletter input[type='email'] {
+  box-sizing: border-box;
+  width: 100%;
+  height: 48px;
+  border: 2px solid var(--newsletter-field-border);
+  border-radius: 2px;
+  padding: 10px 14px;
+  background-color: #fff;
+  color: var(--color-navy);
+  font-family: var(--body-font-family);
+  font-size: var(--button-font-size);
+}
+
+.newsletter input:focus-visible,
+.newsletter button:focus-visible {
+  outline: 2px dotted var(--color-navy);
+  outline-offset: 2px;
+}
+
+.newsletter input:disabled {
+  opacity: 0.6;
+}
+
+.newsletter input:read-only:not([type='checkbox'], [type='radio']) {
+  background-color: var(--color-cream);
+}
+
+.newsletter [aria-invalid='true'],
+.newsletter .has-error input[type='text'],
+.newsletter .has-error input[type='email'] {
+  border-color: #b00020;
+}
+
+.newsletter .newsletter-error,
+.newsletter .newsletter-form-error {
+  margin-top: 8px;
+  color: #b00020;
+  font-size: var(--body-font-size-xs);
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.newsletter .newsletter-mock-note {
+  margin-top: 12px;
+  font-size: var(--body-font-size-xs);
+  font-style: italic;
+}
+
+/* buttons */
+.newsletter .newsletter-actions {
+  margin-top: 40px;
+}
+
+.newsletter .newsletter-button {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  box-sizing: border-box;
+  height: 48px;
+  border: 2px solid transparent;
+  border-radius: 96px;
+  padding: 11px 16px;
+  background-color: var(--color-purple);
+  color: var(--color-cream);
+  font-family: var(--body-font-family);
+  font-size: var(--button-font-size);
+  font-weight: 700;
+  line-height: 1.2;
+  cursor: pointer;
+}
+
+.newsletter .newsletter-button:hover,
+.newsletter .newsletter-button:focus-visible {
+  background-color: var(--color-navy);
+}
+
+.newsletter .newsletter-button:disabled {
+  cursor: progress;
+  opacity: 0.85;
+}
+
+.newsletter .newsletter-spinner {
+  display: none;
+  width: 16px;
+  height: 16px;
+  border: 2px solid currentcolor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: newsletter-spin 0.8s linear infinite;
+}
+
+.newsletter .newsletter-button.is-loading .newsletter-spinner {
+  display: inline-block;
+}
+
+@keyframes newsletter-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* step 2 (below the band, on the page background) */
+.newsletter .newsletter-step2 {
+  display: grid;
+  gap: 56px;
+  padding-top: 5px;
+}
+
+/* source spacing: the name row sits 38px above Organization */
+.newsletter .newsletter-names + .newsletter-field {
+  margin-top: -18px;
+}
+
+.newsletter .newsletter-types legend,
+.newsletter .newsletter-columns legend {
+  margin-bottom: 32px;
+  line-height: 1.1;
+}
+
+.newsletter .newsletter-step2 > .newsletter-field + .newsletter-yesno {
+  margin-top: 16px;
+}
+
+.newsletter .newsletter-step2 > .newsletter-types {
+  margin-top: 22px;
+}
+
+.newsletter .newsletter-types legend {
+  margin-bottom: 46px;
+}
+
+.newsletter .newsletter-step2[hidden] {
+  display: none;
+}
+
+.newsletter .newsletter-names {
+  display: grid;
+  gap: 38px;
+}
+
+.newsletter fieldset {
+  min-width: 0;
+  margin: 0;
+  border: 0;
+  padding: 0;
+}
+
+.newsletter .newsletter-options {
+  display: grid;
+  gap: 24px 32px;
+}
+
+.newsletter .newsletter-yesno .newsletter-options {
+  display: flex;
+  gap: 48px;
+}
+
+.newsletter .newsletter-option {
+  position: relative;
+}
+
+.newsletter .newsletter-option > label {
+  display: inline-flex;
+  align-items: flex-start;
+  gap: 12px;
+  font-size: var(--button-font-size);
+  font-weight: 500;
+  line-height: 1.3;
+  cursor: pointer;
+}
+
+.newsletter .newsletter-types .newsletter-option > label {
+  font-weight: 700;
+}
+
+.newsletter input[type='checkbox'],
+.newsletter input[type='radio'] {
+  flex: 0 0 auto;
+  appearance: none;
+  width: 24px;
+  height: 24px;
+  margin: 0;
+  border: 2px solid var(--color-navy);
+  border-radius: 2px;
+  background-color: #fffffc;
+  cursor: pointer;
+}
+
+.newsletter input[type='radio'] {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+}
+
+.newsletter input[type='checkbox']:checked {
+  border-color: var(--color-purple);
+  background: var(--color-purple) center / 14px no-repeat url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 14 11'%3E%3Cpath d='M1 5.5 5 9.5 13 1.5' fill='none' stroke='%23fdfdf9' stroke-width='2.5'/%3E%3C/svg%3E");
+}
+
+.newsletter input[type='radio']:checked {
+  border-color: var(--color-purple);
+  box-shadow: inset 0 0 0 5px #fffffc;
+  background-color: var(--color-purple);
+}
+
+.newsletter .newsletter-option-desc {
+  margin: 12px 0 0 36px;
+  font-size: var(--body-font-size-s);
+  line-height: 1.4;
+}
+
+.newsletter .newsletter-tip-button {
+  width: 22px;
+  height: 22px;
+  margin-left: 8px;
+  border: 2px solid var(--color-navy);
+  border-radius: 50%;
+  padding: 0;
+  background: transparent;
+  color: var(--color-navy);
+  font: 700 12px/1 var(--body-font-family);
+  vertical-align: top;
+  cursor: pointer;
+}
+
+.newsletter .newsletter-tip-button::before {
+  content: 'i';
+}
+
+.newsletter .newsletter-tip {
+  margin: 12px 0 0 36px;
+  border-radius: 0 16px;
+  padding: 12px 16px;
+  background-color: var(--newsletter-lavender);
+  font-size: var(--body-font-size-xs);
+  line-height: 1.4;
+}
+
+.newsletter .newsletter-option-other {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+
+.newsletter .newsletter-option-other input[type='text'] {
+  flex: 1 1 160px;
+  height: 40px;
+}
+
+.newsletter .newsletter-option-other .newsletter-error {
+  flex-basis: 100%;
+}
+
+/* result */
+.newsletter .newsletter-result h3 {
+  font-family: var(--heading-font-family);
+  font-size: var(--heading-font-size-l);
+  font-weight: 500;
+  line-height: 1;
+}
+
+.newsletter .newsletter-result p {
+  margin-top: 16px;
+  font-size: var(--body-font-size-m);
+}
+
+.newsletter .newsletter-result:focus {
+  outline: none;
+}
+
+@media (width >= 900px) {
+  .newsletter .newsletter-band {
+    grid-template-columns: minmax(0, 544px) minmax(0, 392px);
+    justify-content: space-between;
+    gap: 56px;
+    border-radius: 88px 0;
+    padding: 56px 104px 65px;
+  }
+
+  .newsletter .newsletter-band.is-expanded {
+    border-radius: 88px 88px 0 0;
+  }
+
+  /* the source band heading is 54px (between the H1 and H2 sizes) */
+  .newsletter .newsletter-intro h2 {
+    font-size: 54px;
+    line-height: 0.95;
+  }
+
+  .newsletter .newsletter-step2 {
+    padding-top: 88px;
+  }
+
+  .newsletter .newsletter-names {
+    grid-template-columns: repeat(2, minmax(0, 328px));
+    gap: 24px;
+  }
+
+  .newsletter .newsletter-step2 > .newsletter-field {
+    max-width: 680px;
+  }
+
+  .newsletter .newsletter-types .newsletter-options {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 32px 48px;
+  }
+
+  .newsletter .newsletter-columns .newsletter-options {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 24px 48px;
+  }
+}

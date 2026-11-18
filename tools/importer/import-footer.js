@@ -4,7 +4,8 @@
 /**
  * Import script for the global footer fragment page (/footer).
  * Reads footer.cmp-footer from any rwjf.org page and writes default content in four sections:
- *   0 newsletter placeholder (section style "newsletter-placeholder", hidden on the site)
+ *   0 newsletter   "Newsletter" block (key-value: heading, intro, endpoint, siteKey, successHeading),
+ *                  shown above the navy footer
  *   1 footer-top     logo, contact, manage your grants + social icon links
  *   2 footer-sitemap column titles (H2 links) + link lists ("... Overview" duplicates dropped)
  *   3 footer-legal   copyright + legal links
@@ -156,6 +157,32 @@ function buildLegal(document, src) {
   return out;
 }
 
+// "Stay informed" signup: texts from the source band; endpoint = RWJF dev publish servlet
+const NEWSLETTER = {
+  heading: 'Stay informed',
+  intro: 'Sign up for the latest funding alerts, news, research, and perspectives from RWJF.',
+  endpoint: 'https://dev-sp3.rwjf.cloud/action/servlets/subscription',
+  siteKey: '6Ld7dqorAAAAAIAefIumXAPxDqaVBd4luMMHmi1w',
+  successHeading: 'Subscribed!',
+};
+
+function buildNewsletter(document) {
+  const src = document.querySelector('.cmp-experiencefragment--email-subscription');
+  const heading = clean(src?.querySelector('h2')?.textContent) || NEWSLETTER.heading;
+  const intro = clean(src?.querySelector('.cmp-emailsub__form--default_description')?.textContent) || NEWSLETTER.intro;
+  const success = clean(src?.querySelector('[data-cmp-item="confirmation"] h3')?.textContent) || NEWSLETTER.successHeading;
+  return WebImporter.Blocks.createBlock(document, {
+    name: 'Newsletter',
+    cells: [
+      ['heading', heading],
+      ['intro', el(document, 'p', intro)],
+      ['endpoint', NEWSLETTER.endpoint],
+      ['siteKey', NEWSLETTER.siteKey],
+      ['successHeading', success],
+    ],
+  });
+}
+
 export default {
   transform: ({ document }) => {
     const src = document.querySelector('footer.cmp-footer');
@@ -163,8 +190,7 @@ export default {
     if (!src) return [{ element: main, path: '/footer', report: { error: 'footer.cmp-footer not found' } }];
 
     const sections = [
-      [el(document, 'p', 'Newsletter signup ("Stay informed"), placeholder. It will be built in a separate task.'),
-        WebImporter.Blocks.createBlock(document, { name: 'Section Metadata', cells: { style: 'newsletter-placeholder' } })],
+      [buildNewsletter(document)],
       buildTop(document, src),
       buildSitemap(document, src),
       buildLegal(document, src),
