@@ -6,6 +6,7 @@ packages are excluded from Edge Delivery code sync (`.hlxignore`).
 
 | Package | Filter roots | Notes |
 |---|---|---|
+| `packages/rwjf-eds-nav-1.0.0.zip` | `/content/rwjf-eds/nav` | **Current header.** Global nav fragment page (needs the `nav` branch code): logo link, nested list of menu items and sub-links, "Find A Grant" and the Search link. No DAM assets: icons come from the code |
 | `packages/rwjf-eds-footer-1.0.1.zip` | `/content/rwjf-eds/footer` | **Current footer.** Global footer fragment page (needs the `footer` branch code), with a hidden newsletter placeholder section. No DAM assets: icons come from the code. The address links to a comma-free Google Maps search URL |
 | `packages/rwjf-eds-footer-1.0.0.zip` | same | Superseded by 1.0.1 (AEM added `%20` after the commas in its Maps link) |
 | `packages/rwjf-eds-presidents-message-2015-1.0.1.zip` | `/content/rwjf-eds/en/about-rwjf/our-guiding-principles/annual-messages/presidents-message-2015`, `/content/dam/rwjf-eds/annual-messages/2015` | **Current.** "Download annual message" moved from the hero into the intro section (section style `intro`, needs the `layout-fixes` code) |
@@ -13,4 +14,4 @@ packages are excluded from Edge Delivery code sync (`.hlxignore`).
 
 Install: Package Manager → Upload Package → Install. All filter roots install in replace mode.
 For the page package, run Reprocess Assets on `/content/dam/rwjf-eds/annual-messages/2015`
-afterwards. For the footer, preview `/content/rwjf-eds/footer` from AEM so every page picks it up.
+afterwards. For the footer and nav, preview `/content/rwjf-eds/footer` or `/content/rwjf-eds/nav` from AEM so every page picks it up, then publish with the Sidekick on the `.page` URL.
