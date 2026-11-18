@@ -6,7 +6,8 @@ packages are excluded from Edge Delivery code sync (`.hlxignore`).
 
 | Package | Filter roots | Notes |
 |---|---|---|
-| `packages/rwjf-eds-footer-1.0.0.zip` | `/content/rwjf-eds/footer` | Global footer fragment page (needs the `footer` branch code). Includes a hidden newsletter placeholder section. No DAM assets: icons come from the code |
+| `packages/rwjf-eds-footer-1.0.1.zip` | `/content/rwjf-eds/footer` | **Current footer.** Global footer fragment page (needs the `footer` branch code), with a hidden newsletter placeholder section. No DAM assets: icons come from the code. The address links to a comma-free Google Maps search URL |
+| `packages/rwjf-eds-footer-1.0.0.zip` | same | Superseded by 1.0.1 (AEM added `%20` after the commas in its Maps link) |
 | `packages/rwjf-eds-presidents-message-2015-1.0.1.zip` | `/content/rwjf-eds/en/about-rwjf/our-guiding-principles/annual-messages/presidents-message-2015`, `/content/dam/rwjf-eds/annual-messages/2015` | **Current.** "Download annual message" moved from the hero into the intro section (section style `intro`, needs the `layout-fixes` code) |
 | `packages/rwjf-eds-presidents-message-2015-1.0.0.zip` | same | Superseded by 1.0.1 |
 
