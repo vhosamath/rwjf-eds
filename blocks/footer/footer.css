@@ -1,20 +1,279 @@
+/* RWJF global footer (source: rwjf.org), content from the /footer fragment page */
 footer {
-  background-color: var(--light-color);
-  font-size: var(--body-font-size-xs);
+  --footer-yellow: #ffe873;
+  --footer-divider: rgb(252 252 247 / 20%);
+
+  background-color: var(--color-navy);
+  color: var(--color-cream);
 }
 
 footer .footer > div {
-  margin: auto;
-  max-width: 1200px;
-  padding: 40px 24px 24px;
+  margin: 0;
+  padding: 0;
 }
 
-footer .footer p {
+footer .footer .section {
+  max-width: var(--content-max-width);
+  margin: 0 auto;
+  padding: 0 var(--content-padding);
+}
+
+footer .footer .footer-newsletter {
+  display: none;
+}
+
+footer .footer p,
+footer .footer ul {
+  margin: 0;
+  padding: 0;
+}
+
+footer .footer ul {
+  list-style: none;
+}
+
+footer .footer a:any-link {
+  color: inherit;
+  text-decoration: none;
+}
+
+footer .footer a:hover {
+  text-decoration: underline;
+}
+
+footer .footer a:focus-visible {
+  outline-color: var(--color-cream);
+}
+
+/* top: logo, contact, manage your grants + social */
+footer .footer-top .default-content-wrapper {
+  display: flex;
+  flex-direction: column;
+  padding: 48px 0;
+}
+
+footer .footer-top .footer-col + .footer-col {
+  margin-top: 48px;
+}
+
+footer .footer-top .footer-col:nth-child(3) {
+  margin-top: 70px;
+}
+
+footer .footer-top .footer-logo .icon-rwjf-logo {
+  display: block;
+  width: 357px;
+  max-width: 100%;
+  height: 64px;
+}
+
+footer .footer-top .footer-logo .icon-rwjf-logo img {
+  object-fit: contain;
+  object-position: left center;
+}
+
+footer .footer-top h2 {
+  margin: 0 0 16px;
+  color: var(--footer-yellow);
+  font-family: var(--heading-font-family);
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+footer .footer-top p {
+  margin: 0 0 24px;
+  font-size: var(--button-font-size);
+  font-weight: 500;
+  line-height: 1.1;
+}
+
+/* the address keeps a little more space below it, as on the source */
+footer .footer-top h2 + p {
+  margin-bottom: 40px;
+}
+
+footer .footer-top .footer-logo p {
   margin: 0;
 }
 
+footer .footer-top .footer-col:last-child h2 + p {
+  margin: 0;
+  font-family: var(--heading-font-family);
+  font-size: 30px;
+  line-height: 1;
+}
+
+footer .footer-top .footer-social {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 24px;
+  padding-top: 64px;
+}
+
+footer .footer .footer-social a {
+  display: inline-flex;
+  color: var(--color-cream);
+}
+
+footer .footer .footer-social a:hover,
+footer .footer .footer-social a:focus-visible {
+  color: var(--color-purple);
+}
+
+footer .footer-social .icon {
+  width: 24px;
+  height: 25px;
+  background-color: currentcolor;
+  mask: var(--footer-icon) center / contain no-repeat;
+  transition: background-color 0.2s ease-in-out;
+}
+
+footer .footer-top .footer-social .icon img {
+  visibility: hidden;
+}
+
+footer .footer-social .icon-facebook {
+  --footer-icon: url('../../icons/facebook.svg');
+}
+
+footer .footer-social .icon-linkedin {
+  --footer-icon: url('../../icons/linkedin.svg');
+}
+
+footer .footer-social .icon-youtube {
+  --footer-icon: url('../../icons/youtube.svg');
+
+  width: 32px;
+  height: 22px;
+}
+
+footer .footer-social .icon-instagram {
+  --footer-icon: url('../../icons/instagram.svg');
+
+  width: 25px;
+  height: 24px;
+}
+
+/* sitemap */
+footer .footer-sitemap .default-content-wrapper {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px;
+  padding: 48px 0 24px;
+  border-top: 1px solid var(--footer-divider);
+}
+
+footer .footer-sitemap h2 {
+  margin: 0 0 24px;
+  font-family: var(--heading-font-family);
+  font-size: 30px;
+  font-weight: 500;
+  line-height: 1;
+}
+
+footer .footer-sitemap li {
+  margin: 0 0 24px;
+  font-size: var(--body-font-size-m);
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+/* legal */
+footer .footer-legal .default-content-wrapper {
+  display: flex;
+  flex-direction: column;
+  padding: 56px 0 89px;
+  border-top: 1px solid var(--footer-divider);
+}
+
+footer .footer-legal .footer-copyright {
+  margin-bottom: 49px;
+  font-size: var(--caption-font-size);
+  line-height: 1.5;
+}
+
+footer .footer-legal .footer-copyright-years {
+  display: block;
+  margin-bottom: 4px;
+}
+
+footer .footer-legal ul {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+footer .footer-legal li {
+  font-size: var(--cta-link-font-size);
+  font-weight: 500;
+  line-height: 30px;
+}
+
 @media (width >= 900px) {
-  footer .footer > div {
-    padding: 40px 32px 24px;
+  footer .footer-top .default-content-wrapper {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    column-gap: var(--column-gap);
+  }
+
+  footer .footer-top .footer-col + .footer-col,
+  footer .footer-top .footer-col:nth-child(3) {
+    margin-top: 0;
+  }
+
+  footer .footer-top .footer-logo {
+    grid-column: span 2;
+  }
+
+  footer .footer-top .footer-col:last-child {
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* social icons sit at the bottom of the row */
+  footer .footer-top .footer-social {
+    margin-top: auto;
+    padding-top: 64px;
+  }
+
+  /* dividers: the sitemap one spans the padded container, the legal one the content width */
+  footer .footer-sitemap {
+    border-top: 1px solid var(--footer-divider);
+  }
+
+  footer .footer-sitemap .default-content-wrapper {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0 var(--column-gap);
+    padding: 48px 0 72px;
+    border-top: 0;
+  }
+
+  footer .footer-legal .default-content-wrapper {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    column-gap: var(--column-gap);
+    align-items: center;
+    padding: 40px 0 129px;
+  }
+
+  footer .footer-legal .footer-copyright {
+    grid-column: span 2;
+    margin: 0;
+  }
+
+  footer .footer-legal .footer-copyright-years {
+    display: inline;
+    margin: 0;
+  }
+
+  footer .footer-legal ul {
+    grid-column: span 2;
+    flex-direction: row;
+    justify-content: space-between;
+    gap: 0;
+    padding-left: 24px;
   }
 }
