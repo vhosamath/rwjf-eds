@@ -83,6 +83,12 @@ header .nav-brand {
   flex: 1 1 0;
 }
 
+/* no text line box around the logo, so it is centred in the 96px bar (as on the source) */
+header .nav-brand p {
+  display: flex;
+  align-items: center;
+}
+
 header .nav-logo {
   display: inline-flex;
 }
