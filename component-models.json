@@ -199,6 +199,10 @@
           {
             "name": "Intro (first link left, heading + lead line right)",
             "value": "intro"
+          },
+          {
+            "name": "Newsletter placeholder (hidden)",
+            "value": "newsletter-placeholder"
           }
         ]
       }

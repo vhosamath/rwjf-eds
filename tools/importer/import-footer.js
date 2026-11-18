@@ -1,0 +1,174 @@
+/* eslint-disable */
+/* global WebImporter */
+
+/**
+ * Import script for the global footer fragment page (/footer).
+ * Reads footer.cmp-footer from any rwjf.org page and writes default content in four sections:
+ *   0 newsletter placeholder (section style "newsletter-placeholder", hidden on the site)
+ *   1 footer-top     logo, contact, manage your grants + social icon links
+ *   2 footer-sitemap column titles (H2 links) + link lists ("... Overview" duplicates dropped)
+ *   3 footer-legal   copyright + legal links
+ * Relative/rwjf.org links become absolute https://www.rwjf.org/... (pages not migrated yet).
+ * Icons use the :icon-name: convention (span.icon-*) backed by /icons/*.svg.
+ */
+
+const SITE = 'https://www.rwjf.org';
+const SOCIAL_ICONS = ['facebook', 'linkedin', 'youtube', 'instagram'];
+
+function clean(text) {
+  return (text || '').replace(/\s+/g, ' ').trim();
+}
+
+function absolute(href) {
+  if (!href) return href;
+  if (/^(tel|mailto):/i.test(href)) return href;
+  try {
+    const url = new URL(href, SITE);
+    if (/(^|\.)rwjf\.org$/i.test(url.hostname) && !/^my\./i.test(url.hostname)) {
+      return `${SITE}${url.pathname}${url.search}${url.hash}`;
+    }
+    return url.href;
+  } catch (e) {
+    return href;
+  }
+}
+
+function link(document, href, text) {
+  const a = document.createElement('a');
+  a.setAttribute('href', absolute(href));
+  if (text) a.textContent = text;
+  return a;
+}
+
+/** icons are authored with the :icon-name: notation, which Edge Delivery turns into span.icon */
+function icon(document, name) {
+  return document.createTextNode(`:${name}:`);
+}
+
+function el(document, tag, ...children) {
+  const node = document.createElement(tag);
+  children.filter(Boolean).forEach((c) => node.append(c));
+  return node;
+}
+
+/** "label<br>value" paragraphs keep their line breaks */
+function linesOf(node) {
+  const parts = [];
+  let current = '';
+  node.childNodes.forEach((n) => {
+    if (n.nodeName === 'BR') { parts.push(clean(current)); current = ''; } else current += ` ${n.textContent}`;
+  });
+  parts.push(clean(current));
+  return parts.filter(Boolean);
+}
+
+function buildTop(document, src) {
+  const out = [];
+  const logo = src.querySelector('.cmp-footer-links_col-logo a');
+  if (logo) {
+    const a = link(document, logo.getAttribute('href') || SITE, '');
+    a.append(icon(document, 'rwjf-logo'), ' Robert Wood Johnson Foundation');
+    out.push(el(document, 'p', a));
+  }
+
+  const contact = src.querySelector('.cmp-footer-links_col-contact');
+  if (contact) {
+    const heading = contact.querySelector('.cmp-footer-links_col-sectionheading');
+    out.push(el(document, 'h2', clean(heading?.textContent) ? titleCase(clean(heading.textContent)) : 'Contact RWJF'));
+    contact.querySelectorAll(':scope > p:not(.cmp-footer-links_col-sectionheading)').forEach((p) => {
+      if (!clean(p.textContent)) return;
+      const a = p.querySelector('a[href]');
+      const para = document.createElement('p');
+      if (a && !a.getAttribute('href').startsWith('tel:')) {
+        // address: the whole paragraph is the map link, keep the line break
+        const lines = linesOf(a);
+        const mapLink = link(document, a.getAttribute('href'), '');
+        lines.forEach((line, i) => { if (i) mapLink.append(document.createElement('br')); mapLink.append(line); });
+        para.append(mapLink);
+      } else if (a) {
+        // "US Toll Free:<br><a tel>" style
+        const label = clean([...p.childNodes].filter((n) => n !== a && n.nodeName !== 'BR').map((n) => n.textContent).join(' '));
+        if (label) para.append(label, document.createElement('br'));
+        para.append(link(document, a.getAttribute('href'), clean(a.textContent)));
+      } else {
+        para.textContent = clean(p.textContent);
+      }
+      out.push(para);
+    });
+  }
+
+  const grants = src.querySelector('.cmp-footer-links_text');
+  if (grants) {
+    const heading = grants.querySelector('.cmp-footer-links_col-sectionheading');
+    out.push(el(document, 'h2', titleCase(clean(heading?.textContent) || 'Manage Your Grants')));
+    grants.querySelectorAll('a[href]').forEach((a) => out.push(el(document, 'p', link(document, a.getAttribute('href'), clean(a.textContent)))));
+  }
+
+  const socials = [...src.querySelectorAll('.cmp-footer-links_socials-wrap a[href]')];
+  if (socials.length) {
+    const ul = document.createElement('ul');
+    socials.forEach((a) => {
+      const name = SOCIAL_ICONS.find((n) => a.querySelector(`.icon-${n}`)) || clean(a.textContent).toLowerCase();
+      const label = clean(a.querySelector('.visually-hidden')?.textContent || a.textContent) || name;
+      const item = link(document, a.getAttribute('href'), '');
+      item.append(icon(document, name), ` ${label}`);
+      ul.append(el(document, 'li', item));
+    });
+    out.push(ul);
+  }
+  return out;
+}
+
+function titleCase(text) {
+  // source labels are uppercased by CSS; store them in title case ("Contact RWJF")
+  return text.toLowerCase().replace(/\b\w/g, (c) => c.toUpperCase()).replace(/\bRwjf\b/g, 'RWJF');
+}
+
+function buildSitemap(document, src) {
+  const out = [];
+  src.querySelectorAll('.cmp-footer-section2 .cmp-footer-links > li').forEach((col) => {
+    const title = col.querySelector('.link-col-heading');
+    if (title) out.push(el(document, 'h2', link(document, title.getAttribute('href'), clean(title.textContent))));
+    const ul = document.createElement('ul');
+    col.querySelectorAll('.cmp-footer-links_col-linkwrap > li a[href]').forEach((a) => {
+      // the first "... Overview" link duplicates the column title and is hidden on the source
+      if (title && /overview$/i.test(clean(a.textContent)) && absolute(a.getAttribute('href')) === absolute(title.getAttribute('href'))) return;
+      ul.append(el(document, 'li', link(document, a.getAttribute('href'), clean(a.textContent))));
+    });
+    if (ul.children.length) out.push(ul);
+  });
+  return out;
+}
+
+function buildLegal(document, src) {
+  const out = [];
+  const copy = clean([...src.querySelectorAll('.cmp-footer-section3 .date-number p')].map((p) => clean(p.textContent)).join(' '))
+    .replace(/(©\s*\d{4}\s*-)\s*(\d{4})/, '$1$2');
+  if (copy) out.push(el(document, 'p', copy));
+  const ul = document.createElement('ul');
+  src.querySelectorAll('.cmp-footer-links_terms a[href]').forEach((a) => ul.append(el(document, 'li', link(document, a.getAttribute('href'), clean(a.textContent)))));
+  if (ul.children.length) out.push(ul);
+  return out;
+}
+
+export default {
+  transform: ({ document }) => {
+    const src = document.querySelector('footer.cmp-footer');
+    const main = document.createElement('div');
+    if (!src) return [{ element: main, path: '/footer', report: { error: 'footer.cmp-footer not found' } }];
+
+    const sections = [
+      [el(document, 'p', 'Newsletter signup ("Stay informed"), placeholder. It will be built in a separate task.'),
+        WebImporter.Blocks.createBlock(document, { name: 'Section Metadata', cells: { style: 'newsletter-placeholder' } })],
+      buildTop(document, src),
+      buildSitemap(document, src),
+      buildLegal(document, src),
+    ];
+    sections.forEach((nodes, i) => {
+      if (i) main.append(document.createElement('hr'));
+      main.append(...nodes);
+    });
+
+    return [{ element: main, path: '/footer', report: { sections: sections.length } }];
+  },
+};
