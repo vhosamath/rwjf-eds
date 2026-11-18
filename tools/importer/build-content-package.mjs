@@ -105,7 +105,8 @@ if (socialImage) pageXml = pageXml.replace(/(<jcr:content [^>]*?)( modelFields=)
 
 // --single-text-sections: keep each section as ONE rich-text component holding the imported HTML,
 // instead of md2jcr's title/button/text split (Title stores plain text, so links inside headings
-// would break, and link-only paragraphs would become styled buttons). Used for the /footer fragment.
+// would break, and link-only paragraphs would become styled buttons). Used for the /footer and /nav
+// fragments. Sections that contain a block are left as md2jcr built them.
 if (args.includes('--single-text-sections')) {
   const sectionHtml = html.split(/\n(?=<div>)/).map((chunk) => chunk.trim()).filter(Boolean)
     .map((chunk) => chunk.replace(/^<div>|<\/div>$/g, '')
@@ -116,6 +117,8 @@ if (args.includes('--single-text-sections')) {
   pageXml = pageXml.replace(/<(section(?:_\d+)?) ([^>]*?)(\/?)>(?:([\s\S]*?)<\/\1>)?/g, (m, tag, attrs) => {
     const content = sectionHtml[index] || '';
     index += 1;
+    // sections holding a block (e.g. the newsletter) keep md2jcr's block node
+    if (/<div class="(?!section-metadata)[a-z]/.test(content)) return m;
     if (!content) return `<${tag} ${attrs}/>`;
     return `<${tag} ${attrs}>\n        <text sling:resourceType="core/franklin/components/text/v1/text" jcr:primaryType="nt:unstructured" text="${xmlAttr(content)}"/>\n      </${tag}>`;
   });

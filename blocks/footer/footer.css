@@ -3,8 +3,17 @@ footer {
   --footer-yellow: #ffe873;
   --footer-divider: rgb(252 252 247 / 20%);
 
+  background-color: var(--background-color);
+}
+
+/* the navy footer; the newsletter band (if any) sits above it on the page background */
+footer .footer-main {
   background-color: var(--color-navy);
   color: var(--color-cream);
+}
+
+footer .footer .section.footer-signup {
+  margin-bottom: 16px;
 }
 
 footer .footer > div {
@@ -213,6 +222,10 @@ footer .footer-legal li {
 }
 
 @media (width >= 900px) {
+  footer .footer .section.footer-signup {
+    margin-bottom: 24px;
+  }
+
   footer .footer-top .default-content-wrapper {
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));

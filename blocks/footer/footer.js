@@ -133,11 +133,18 @@ export default async function decorate(block) {
   const footer = document.createElement('div');
   while (fragment?.firstElementChild) footer.append(fragment.firstElementChild);
 
-  textIconsToSpans(footer);
-  decorateIcons(footer);
+  // the newsletter signup section sits above the navy footer and is not counted in the roles below
+  const signups = [...footer.querySelectorAll(':scope > .section')].filter((s) => s.querySelector('.newsletter'));
+  signups.forEach((section) => section.classList.add('footer-signup'));
+
+  [...footer.querySelectorAll(':scope > .section')].filter((s) => !signups.includes(s)).forEach((section) => {
+    textIconsToSpans(section);
+    decorateIcons(section);
+  });
 
   let role = 0;
   footer.querySelectorAll(':scope > .section').forEach((section) => {
+    if (signups.includes(section)) return;
     if (section.classList.contains('newsletter-placeholder')) {
       section.classList.add('footer-newsletter');
       return;
@@ -153,6 +160,11 @@ export default async function decorate(block) {
     if (name === 'footer-legal') decorateLegal(section);
   });
 
-  decorateLinks(footer);
+  // navy area: everything except the signup band
+  const main = document.createElement('div');
+  main.className = 'footer-main';
+  [...footer.querySelectorAll(':scope > .section')].filter((s) => !signups.includes(s)).forEach((s) => main.append(s));
+  decorateLinks(main);
+  footer.append(main);
   block.append(footer);
 }
