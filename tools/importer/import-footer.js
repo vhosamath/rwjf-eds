@@ -82,7 +82,12 @@ function buildTop(document, src) {
       if (a && !a.getAttribute('href').startsWith('tel:')) {
         // address: the whole paragraph is the map link, keep the line break
         const lines = linesOf(a);
-        const mapLink = link(document, a.getAttribute('href'), '');
+        // Google Maps directions URLs are full of commas, and AEM inserts "%20" after each comma
+        // when it delivers links; a comma-free search URL for the address avoids that
+        const href = /google\.[a-z.]+\/maps/i.test(a.getAttribute('href'))
+          ? `https://www.google.com/maps/search/?api=1&query=${lines.join(' ').replace(/,/g, '').trim().split(/\s+/).map(encodeURIComponent).join('+')}`
+          : a.getAttribute('href');
+        const mapLink = link(document, href, '');
         lines.forEach((line, i) => { if (i) mapLink.append(document.createElement('br')); mapLink.append(line); });
         para.append(mapLink);
       } else if (a) {
