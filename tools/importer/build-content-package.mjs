@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /* eslint-disable */
 /**
- * Builds an AEM FileVault content package (zip) for one imported xwalk page and its DAM assets,
+ * Builds an AEM FileVault content package (zip) for imported xwalk pages and their DAM assets,
  * for installation through CRX Package Manager on a self-hosted AEM author.
  *
  *   node tools/importer/build-content-package.mjs \
@@ -11,14 +11,23 @@
  *     --asset 2015_RWJF_PresidentsMessage.pdf=https://www.rwjf.org/content/dam/files/.../2015_RWJF_PresidentsMessage.pdf \
  *     --name rwjf-eds-presidents-message-2015 --out migration-work/package
  *
+ * Several pages (e.g. an article and a fragment page it references) can go in one package:
+ * repeat --page; each page gets its own filter root. Other options:
+ *   --dam-map <Scene7 name>=<dam root>   put that Scene7 image under another DAM folder (own filter root)
+ *   --image <file>=<src substring>       a non-Scene7 <img> (e.g. a YouTube poster) whose src contains
+ *                                        the substring becomes <dam-root>/<file>, downloaded from its src
+ *   --image-source <file>=<url|path>     download that --image file from another URL, or read it from disk
+ * Fragment references written as site paths (/fragments/x) are mapped to <site-root>/fragments/x.
+ *
  * What it does:
- *  1. Rewrites every Scene7 image in the page (body + metadata) to a DAM path under --dam-root and
- *     downloads a 2000px JPEG rendition of it as the asset original.
+ *  1. Rewrites every Scene7 image in the pages (body + metadata) to a DAM path under --dam-root (or
+ *     its --dam-map folder) and downloads a 2000px JPEG rendition of it as the asset original;
+ *     --image files likewise.
  *  2. Downloads the extra --asset files (e.g. the PDF the page links to under --dam-root).
- *  3. Converts the page to JCR with the same converters the xwalk content check uses
+ *  3. Converts each page to JCR with the same converters the xwalk content check uses
  *     (helix-html2md + helix-md2jcr against this project's component models), then fixes property
  *     types (publication-date -> Date, read-time -> Long) and block-in-paragraph wrapping.
- *  4. Writes jcr_root + META-INF/vault (filter.xml with the page and, when given, --dam-root;
+ *  4. Writes jcr_root + META-INF/vault (filter.xml with each page and each DAM folder used;
  *     --dam-root is optional for pages without DAM assets, e.g. the /footer fragment)
  *     and zips it. Ancestor pages/folders are included as stubs; being outside the filter they are
  *     only created when missing and never overwritten.
@@ -35,21 +44,22 @@ const opt = (name, fallback) => {
   return i >= 0 ? args[i + 1] : fallback;
 };
 const optAll = (name) => args.flatMap((a, i) => (a === `--${name}` ? [args[i + 1]] : []));
+const pairs = (name) => optAll(name).map((a) => a.split(/=(.+)/).slice(0, 2));
 
 const CONVERTERS = opt('converters', '/home/node/.excat-marketplaces/excat-marketplace/excat/skills/excat-content-import/scripts/node_modules/@adobe');
-const pageFile = opt('page');
+const pageFiles = optAll('page');
 const siteRoot = opt('site-root', '/content/rwjf-eds');
 const damRoot = opt('dam-root');
 const pkgName = opt('name', 'content-package');
 const pkgGroup = opt('group', 'rwjf-eds');
 const pkgVersion = opt('version', '1.0.0');
 const outDir = opt('out', 'migration-work/package');
-const extraAssets = optAll('asset').map((a) => {
-  const [file, url] = a.split(/=(.+)/);
-  return { file, url };
-});
-if (!pageFile) {
-  console.error('usage: --page <content/**.plain.html> [--dam-root /content/dam/...] [--asset file=url] [--name n]');
+const extraAssets = pairs('asset').map(([file, url]) => ({ file, url }));
+const damMap = new Map(pairs('dam-map'));
+const imageMap = pairs('image').map(([file, match]) => ({ file, match }));
+const imageSources = new Map(pairs('image-source'));
+if (!pageFiles.length) {
+  console.error('usage: --page <content/**.plain.html> [--page …] [--dam-root /content/dam/...] [--dam-map name=root] [--image file=match] [--image-source file=url|path] [--asset file=url] [--name n]');
   process.exit(1);
 }
 
@@ -65,68 +75,105 @@ const decode = (v) => v.replace(/&amp;/g, '&').replace(/&quot;/g, '"').replace(/
 const MIME = { jpg: 'image/jpeg', jpeg: 'image/jpeg', png: 'image/png', pdf: 'application/pdf' };
 
 // ---------------------------------------------------------------- 1. page html + image mapping
-const contentRel = relative('content', pageFile).replace(/\.plain\.html$/, '');
-const pagePath = `${siteRoot}/${contentRel}`;
-let html = readFileSync(pageFile, 'utf8');
+const assets = new Map(); // DAM path -> { url, alt }
+const damRoots = new Set(damRoot ? [damRoot] : []);
+// Scene7 names may carry encoded spaces ("…_0362%201"): DAM node names use dashes instead
+const assetName = (name) => `${decodeURIComponent(name).replace(/\s+/g, '-')}.jpg`;
+const altOf = (pre, post) => decode(/alt="([^"]*)"/.exec(`${pre} ${post}`)?.[1] || '');
 
-const assets = new Map(); // file name -> { url, alt }
-if (!damRoot && (/rwjf\.scene7\.com/.test(html) || extraAssets.length)) {
-  console.error('this page has Scene7 images or --asset files: --dam-root is required');
-  process.exit(1);
+function mapImages(source) {
+  let html = source;
+  if (!damRoot && (/rwjf\.scene7\.com/.test(html) || extraAssets.length || imageMap.length)) {
+    console.error('this page has Scene7 images, --image or --asset files: --dam-root is required');
+    process.exit(1);
+  }
+  html = html.replace(/<img([^>]*?)src="(https:\/\/rwjf\.scene7\.com\/is\/image\/rwjf\/([^"?:]+)[^"]*)"([^>]*)>/g, (m, pre, src, name, post) => {
+    const folder = damMap.get(decodeURIComponent(name)) || damMap.get(name) || damRoot;
+    damRoots.add(folder);
+    const path = `${folder}/${assetName(name)}`;
+    const alt = altOf(pre, post);
+    if (!assets.has(path)) {
+      assets.set(path, { url: `https://rwjf.scene7.com/is/image/rwjf/${name}?wid=2000&fmt=jpg&qlt=85`, alt });
+    } else if (alt && !assets.get(path).alt) assets.get(path).alt = alt;
+    return `<img${pre}src="${path}"${post}>`;
+  });
+  // other images (e.g. YouTube posters, embed placeholders), matched by a substring of their src
+  html = html.replace(/<img([^>]*?)src="([^"]+)"([^>]*)>/g, (m, pre, src, post) => {
+    const hit = imageMap.find(({ match }) => decode(src).includes(match));
+    if (!hit) return m;
+    const path = `${damRoot}/${hit.file}`;
+    assets.set(path, { url: imageSources.get(hit.file) || decode(src), alt: altOf(pre, post) });
+    return `<img${pre}src="${path}"${post}>`;
+  });
+  return html;
 }
-html = html.replace(/<img([^>]*?)src="(https:\/\/rwjf\.scene7\.com\/is\/image\/rwjf\/([^"?:]+)[^"]*)"([^>]*)>/g, (m, pre, src, name, post) => {
-  const file = `${name}.jpg`;
-  const alt = decode(/alt="([^"]*)"/.exec(`${pre} ${post}`)?.[1] || '');
-  if (!assets.has(file)) {
-    assets.set(file, { url: `https://rwjf.scene7.com/is/image/rwjf/${name}?wid=2000&fmt=jpg&qlt=85`, alt });
-  } else if (alt && !assets.get(file).alt) assets.get(file).alt = alt;
-  return `<img${pre}src="${damRoot}/${file}"${post}>`;
-});
-extraAssets.forEach(({ file, url }) => assets.set(file, { url, alt: '' }));
 
 // ---------------------------------------------------------------- 2. convert to JCR
 const models = JSON.parse(readFileSync('component-models.json', 'utf8'));
 const definition = JSON.parse(readFileSync('component-definition.json', 'utf8'));
 const filters = JSON.parse(readFileSync('component-filters.json', 'utf8'));
-const md = await html2md(`<body><main>${html}</main></body>`, { log: SILENT });
-let pageXml = await md2jcr(md, {
-  models, definition, filters, log: SILENT,
-});
 
-// richtext values: md2jcr wraps leading block elements in <p> (<p><h1>…</h1></p>): unwrap them
-pageXml = pageXml.replace(/&lt;p&gt;(&lt;(h[1-6]|ol|ul)&gt;[\s\S]*?&lt;\/\2&gt;)&lt;\/p&gt;/g, '$1');
-// typed page properties
-pageXml = pageXml.replace(/ publication-date="(\d{4}-\d{2}-\d{2})"/, ' publication-date="{Date}$1T12:00:00.000Z"');
-pageXml = pageXml.replace(/ read-time="(\d+)"/, ' read-time="{Long}$1"');
-// the page-metadata "image" field is a property; md2jcr writes the social image as an image node:
-// keep the node (featured image) and mirror it into the property so the UE field shows it
-const socialImage = /<image [^>]*fileReference="([^"]+)"/.exec(pageXml)?.[1];
-if (socialImage) pageXml = pageXml.replace(/(<jcr:content [^>]*?)( modelFields=)/, `$1 image="${socialImage}"$2`);
-
-// --single-text-sections: keep each section as ONE rich-text component holding the imported HTML,
-// instead of md2jcr's title/button/text split (Title stores plain text, so links inside headings
-// would break, and link-only paragraphs would become styled buttons). Used for the /footer and /nav
-// fragments. Sections that contain a block are left as md2jcr built them.
-if (args.includes('--single-text-sections')) {
-  const sectionHtml = html.split(/\n(?=<div>)/).map((chunk) => chunk.trim()).filter(Boolean)
-    .map((chunk) => chunk.replace(/^<div>|<\/div>$/g, '')
-      .replace(/<div class="section-metadata">[\s\S]*?<\/div><\/div><\/div>/g, '')
-      .replace(/\s*\n\s*/g, '')
-      .trim());
-  let index = 0;
-  pageXml = pageXml.replace(/<(section(?:_\d+)?) ([^>]*?)(\/?)>(?:([\s\S]*?)<\/\1>)?/g, (m, tag, attrs) => {
-    const content = sectionHtml[index] || '';
-    index += 1;
-    // sections holding a block (e.g. the newsletter) keep md2jcr's block node
-    if (/<div class="(?!section-metadata)[a-z]/.test(content)) return m;
-    if (!content) return `<${tag} ${attrs}/>`;
-    return `<${tag} ${attrs}>\n        <text sling:resourceType="core/franklin/components/text/v1/text" jcr:primaryType="nt:unstructured" text="${xmlAttr(content)}"/>\n      </${tag}>`;
+async function convert(html) {
+  const md = await html2md(`<body><main>${html}</main></body>`, { log: SILENT });
+  let pageXml = await md2jcr(md, {
+    models, definition, filters, log: SILENT,
   });
-  if (index !== sectionHtml.length) console.warn(`WARN: ${index} sections in XML, ${sectionHtml.length} in HTML`);
-}
 
-const leftovers = pageXml.match(/https:\/\/rwjf\.scene7\.com[^"&]*/g);
-if (leftovers) console.warn('WARN: Scene7 URLs left in page XML:', [...new Set(leftovers)]);
+  // richtext values: md2jcr wraps leading block elements in <p> (<p><h1>…</h1></p>): unwrap them
+  pageXml = pageXml.replace(/&lt;p&gt;(&lt;(h[1-6]|ol|ul)&gt;[\s\S]*?&lt;\/\2&gt;)&lt;\/p&gt;/g, '$1');
+  // typed page properties
+  pageXml = pageXml.replace(/ publication-date="(\d{4}-\d{2}-\d{2})"/, ' publication-date="{Date}$1T12:00:00.000Z"');
+  pageXml = pageXml.replace(/ read-time="(\d+)"/, ' read-time="{Long}$1"');
+  // the page-metadata "image" field is a property; md2jcr writes the social image as an image node:
+  // keep the node (featured image) and mirror it into the property so the UE field shows it
+  const socialImage = /<image [^>]*fileReference="([^"]+)"/.exec(pageXml)?.[1];
+  if (socialImage) pageXml = pageXml.replace(/(<jcr:content [^>]*?)( modelFields=)/, `$1 image="${socialImage}"$2`);
+  // fragment references authored as site paths (/fragments/x) -> AEM paths
+  pageXml = pageXml.replace(/ reference="(\/(?!content\/)[^"]*)"/g, (m, path) => ` reference="${siteRoot}${path}"`);
+  // block styles: md2jcr writes the variant list as one string and turns "byline-large" into
+  // "byline large"; restore the model's option values, and write multiselect styles as multi-value
+  pageXml = pageXml.replace(/<(\w+) ([^>]*?)classes="([^"]*)"([^>]*?)model="([^"]+)"/g, (m, tag, pre, value, mid, model) => {
+    const field = models.find((x) => x.id === model)?.fields.find((f) => f.name === 'classes');
+    if (!field) return m;
+    const options = (field.options || []).map((o) => o.value);
+    const values = value.split(/\s*,\s*/).filter(Boolean)
+      .map((v) => (options.includes(v) ? v : (options.find((o) => o === v.replace(/\s+/g, '-')) || v)));
+    const out = field.component === 'multiselect' && values.length > 1 ? `[${values.join(',')}]` : values.join(',');
+    return `<${tag} ${pre}classes="${out}"${mid}model="${model}"`;
+  });
+  // pages without a metadata block (e.g. fragments): title from the first heading
+  if (!/<jcr:content [^>]*jcr:title=/.test(pageXml)) {
+    const heading = /&lt;h[1-6]&gt;(.*?)&lt;\/h[1-6]&gt;|<title [^>]*title="([^"]+)"/.exec(pageXml);
+    const title = heading && (heading[1] || heading[2]);
+    if (title) pageXml = pageXml.replace(/<jcr:content /, `<jcr:content jcr:title="${title.replace(/&lt;[^&]*&gt;/g, '')}" `);
+  }
+
+  // --single-text-sections: keep each section as ONE rich-text component holding the imported HTML,
+  // instead of md2jcr's title/button/text split (Title stores plain text, so links inside headings
+  // would break, and link-only paragraphs would become styled buttons). Used for the /footer and /nav
+  // fragments. Sections that contain a block are left as md2jcr built them.
+  if (args.includes('--single-text-sections')) {
+    const sectionHtml = html.split(/\n(?=<div>)/).map((chunk) => chunk.trim()).filter(Boolean)
+      .map((chunk) => chunk.replace(/^<div>|<\/div>$/g, '')
+        .replace(/<div class="section-metadata">[\s\S]*?<\/div><\/div><\/div>/g, '')
+        .replace(/\s*\n\s*/g, '')
+        .trim());
+    let index = 0;
+    pageXml = pageXml.replace(/<(section(?:_\d+)?) ([^>]*?)(\/?)>(?:([\s\S]*?)<\/\1>)?/g, (m, tag, attrs) => {
+      const content = sectionHtml[index] || '';
+      index += 1;
+      // sections holding a block (e.g. the newsletter) keep md2jcr's block node
+      if (/<div class="(?!section-metadata)[a-z]/.test(content)) return m;
+      if (!content) return `<${tag} ${attrs}/>`;
+      return `<${tag} ${attrs}>\n        <text sling:resourceType="core/franklin/components/text/v1/text" jcr:primaryType="nt:unstructured" text="${xmlAttr(content)}"/>\n      </${tag}>`;
+    });
+    if (index !== sectionHtml.length) console.warn(`WARN: ${index} sections in XML, ${sectionHtml.length} in HTML`);
+  }
+
+  const leftovers = pageXml.match(/https:\/\/rwjf\.scene7\.com[^"&]*/g);
+  if (leftovers) console.warn('WARN: Scene7 URLs left in page XML:', [...new Set(leftovers)]);
+  return pageXml;
+}
 
 // ---------------------------------------------------------------- 3. write the package tree
 rmSync(outDir, { recursive: true, force: true });
@@ -137,47 +184,71 @@ const write = (p, data) => {
   writeFileSync(p, data);
 };
 const nodeDir = (path) => join(jcrRoot, ...path.split('/').filter(Boolean).map((s) => s.replace(/^jcr:/, '_jcr_')));
-
-write(join(nodeDir(pagePath), '.content.xml'), pageXml);
-
-// ancestor page stubs between <site-root>/<lang> and the page (titles from the breadcrumb)
-const crumbTitles = [...html.matchAll(/<li>\s*(?:<a [^>]*>)?([^<]+?)(?:<\/a>)?\s*<\/li>/g)].map((m) => decode(m[1].trim()));
-const segments = contentRel.split('/');
-for (let i = 1; i < segments.length - 1; i += 1) {
-  const path = `${siteRoot}/${segments.slice(0, i + 1).join('/')}`;
-  const title = crumbTitles[i - 1] || segments[i].replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
-  write(join(nodeDir(path), '.content.xml'), `<?xml version="1.0" encoding="UTF-8"?>
+const pageStub = (title) => `<?xml version="1.0" encoding="UTF-8"?>
 <jcr:root ${NS} jcr:primaryType="cq:Page">
   <jcr:content cq:template="/libs/core/franklin/templates/page" sling:resourceType="core/franklin/components/page/v1/page" jcr:primaryType="cq:PageContent" jcr:title="${xmlAttr(title)}">
     <root jcr:primaryType="nt:unstructured" sling:resourceType="core/franklin/components/root/v1/root"/>
   </jcr:content>
 </jcr:root>
-`);
-}
+`;
 
-// DAM folders: ancestors under /content/dam as stubs, the filter root as an ordered folder
-const damSegments = damRoot ? damRoot.split('/').filter(Boolean) : [];
-for (let i = 2; i < damSegments.length; i += 1) {
-  const path = `/${damSegments.slice(0, i + 1).join('/')}`;
-  const isRoot = i === damSegments.length - 1;
-  write(join(nodeDir(path), '.content.xml'), `<?xml version="1.0" encoding="UTF-8"?>
+const pages = [];
+for (const file of pageFiles) {
+  const contentRel = relative('content', file).replace(/\.plain\.html$/, '');
+  const pagePath = `${siteRoot}/${contentRel}`;
+  const html = mapImages(readFileSync(file, 'utf8'));
+  // eslint-disable-next-line no-await-in-loop
+  const pageXml = await convert(html);
+  write(join(nodeDir(pagePath), '.content.xml'), pageXml);
+  pages.push({ pagePath, pageXml });
+
+  // ancestor page stubs below the site root: language pages (/en/...) start below <site-root>/<lang>
+  // (titles from the breadcrumb), other folders such as /fragments get a stub of their own
+  const crumbTitles = [...html.matchAll(/<li>\s*(?:<a [^>]*>)?([^<]+?)(?:<\/a>)?\s*<\/li>/g)].map((m) => decode(m[1].trim()));
+  const hasCrumbs = /class="breadcrumb/.test(html);
+  const segments = contentRel.split('/');
+  const first = /^[a-z]{2}$/.test(segments[0]) ? 1 : 0;
+  for (let i = first; i < segments.length - 1; i += 1) {
+    const path = `${siteRoot}/${segments.slice(0, i + 1).join('/')}`;
+    const title = (hasCrumbs && first && crumbTitles[i - 1]) || segments[i].replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+    write(join(nodeDir(path), '.content.xml'), pageStub(title));
+  }
+}
+extraAssets.forEach(({ file, url }) => assets.set(`${damRoot}/${file}`, { url, alt: '' }));
+
+// DAM folders: ancestors under /content/dam as stubs, each filter root as an ordered folder
+for (const damFolder of damRoots) {
+  const damSegments = damFolder.split('/').filter(Boolean);
+  for (let i = 2; i < damSegments.length; i += 1) {
+    const path = `/${damSegments.slice(0, i + 1).join('/')}`;
+    const isRoot = i === damSegments.length - 1;
+    write(join(nodeDir(path), '.content.xml'), `<?xml version="1.0" encoding="UTF-8"?>
 <jcr:root ${NS} jcr:primaryType="${isRoot ? 'sling:OrderedFolder' : 'sling:Folder'}">
   <jcr:content jcr:primaryType="nt:unstructured" jcr:title="${xmlAttr(damSegments[i])}"/>
 </jcr:root>
 `);
+  }
 }
 
 // assets
 const downloaded = [];
-for (const [file, { url, alt }] of assets) {
-  // eslint-disable-next-line no-await-in-loop
-  const resp = await fetch(url);
-  if (!resp.ok) throw new Error(`download failed ${resp.status}: ${url}`);
-  // eslint-disable-next-line no-await-in-loop
-  const data = Buffer.from(await resp.arrayBuffer());
+for (const [assetPath, { url, alt }] of assets) {
+  const file = assetPath.split('/').pop();
+  let data;
+  let type = '';
+  if (/^https?:/.test(url)) {
+    // eslint-disable-next-line no-await-in-loop
+    const resp = await fetch(url);
+    if (!resp.ok) throw new Error(`download failed ${resp.status}: ${url}`);
+    // eslint-disable-next-line no-await-in-loop
+    data = Buffer.from(await resp.arrayBuffer());
+    type = resp.headers.get('content-type') || '';
+  } else {
+    data = readFileSync(url);
+  }
   const ext = file.split('.').pop().toLowerCase();
-  const mime = MIME[ext] || resp.headers.get('content-type') || 'application/octet-stream';
-  const assetDir = nodeDir(`${damRoot}/${file}`);
+  const mime = MIME[ext] || type || 'application/octet-stream';
+  const assetDir = nodeDir(assetPath);
   write(join(assetDir, '.content.xml'), `<?xml version="1.0" encoding="UTF-8"?>
 <jcr:root ${NS} jcr:primaryType="dam:Asset">
   <jcr:content jcr:primaryType="dam:AssetContent">
@@ -192,14 +263,14 @@ for (const [file, { url, alt }] of assets) {
   <jcr:content jcr:primaryType="nt:resource" jcr:mimeType="${mime}"/>
 </jcr:root>
 `);
-  downloaded.push({ path: `${damRoot}/${file}`, bytes: data.length, mime });
+  downloaded.push({ path: assetPath, bytes: data.length, mime });
 }
 
 // vault metadata
+const filterRoots = [...pages.map((p) => p.pagePath), ...damRoots];
 write(join(root, 'META-INF', 'vault', 'filter.xml'), `<?xml version="1.0" encoding="UTF-8"?>
 <workspaceFilter version="1.0">
-    <filter root="${pagePath}"/>
-${damRoot ? `    <filter root="${damRoot}"/>\n` : ''}</workspaceFilter>
+${filterRoots.map((r) => `    <filter root="${r}"/>\n`).join('')}</workspaceFilter>
 `);
 write(join(root, 'META-INF', 'vault', 'properties.xml'), `<?xml version="1.0" encoding="utf-8" standalone="no"?>
 <!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
@@ -208,7 +279,7 @@ write(join(root, 'META-INF', 'vault', 'properties.xml'), `<?xml version="1.0" en
 <entry key="name">${pkgName}</entry>
 <entry key="group">${pkgGroup}</entry>
 <entry key="version">${pkgVersion}</entry>
-<entry key="description">Migrated page ${pagePath}${damRoot ? ` and its assets under ${damRoot}` : ''}</entry>
+<entry key="description">Migrated ${pages.length > 1 ? 'pages' : 'page'} ${pages.map((p) => p.pagePath).join(', ')}${damRoots.size ? ` and ${pages.length > 1 ? 'their' : 'its'} assets under ${[...damRoots].join(', ')}` : ''}</entry>
 <entry key="packageType">content</entry>
 <entry key="requiresRoot">false</entry>
 <entry key="allowIndexDefinitions">false</entry>
@@ -257,9 +328,9 @@ function zip(files, base) {
 }
 const zipFile = join(outDir, `${pkgName}-${pkgVersion}.zip`);
 writeFileSync(zipFile, zip(listFiles(root), root));
-writeFileSync(join(outDir, 'page.xml'), pageXml);
+pages.forEach((p, i) => writeFileSync(join(outDir, i ? `page-${i}.xml` : 'page.xml'), p.pageXml));
 
 console.log(JSON.stringify({
-  zip: zipFile, page: pagePath, filters: [pagePath, damRoot].filter(Boolean), assets: downloaded,
+  zip: zipFile, pages: pages.map((p) => p.pagePath), filters: filterRoots, assets: downloaded,
 }, null, 2));
 if (!existsSync(zipFile)) process.exit(1);

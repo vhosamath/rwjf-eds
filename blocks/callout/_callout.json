@@ -90,7 +90,7 @@
           "valueType": "string",
           "name": "cta_link",
           "label": "Link",
-          "description": "Page or URL. A YouTube link opens the video in a dialog."
+          "description": "Page or URL. A YouTube link opens the video in a dialog (in the Figure style the image becomes the play button)."
         },
         {
           "component": "text",

@@ -29,6 +29,10 @@
             {
               "name": "Wide (breaks out of the article column)",
               "value": "wide"
+            },
+            {
+              "name": "With image (quote box over a photo, with caption)",
+              "value": "image"
             }
           ]
         },
@@ -39,10 +43,33 @@
           "label": "Quotation"
         },
         {
-          "component": "text",
+          "component": "richtext",
           "valueType": "string",
           "name": "attribution",
-          "label": "Attribution"
+          "label": "Attribution",
+          "description": "One paragraph per line, e.g. one line per person."
+        },
+        {
+          "component": "reference",
+          "valueType": "string",
+          "name": "media_image",
+          "label": "Image",
+          "multi": false,
+          "description": "Used by the \"With image\" style."
+        },
+        {
+          "component": "text",
+          "valueType": "string",
+          "name": "media_imageAlt",
+          "label": "Image alt text",
+          "value": ""
+        },
+        {
+          "component": "richtext",
+          "valueType": "string",
+          "name": "media_caption",
+          "label": "Image caption",
+          "description": "Caption and photo credit shown next to the quote box."
         }
       ]
     }

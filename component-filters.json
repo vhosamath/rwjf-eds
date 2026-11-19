@@ -19,7 +19,10 @@
       "breadcrumb",
       "quote",
       "callout",
-      "newsletter"
+      "newsletter",
+      "embed",
+      "tags",
+      "share"
     ]
   },
   {

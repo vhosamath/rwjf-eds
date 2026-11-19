@@ -39,6 +39,14 @@
               "value": "aside"
             },
             {
+              "name": "Aside, wide (last block in a half-width right rail)",
+              "value": "aside-wide"
+            },
+            {
+              "name": "Three up (blocks side by side in three columns)",
+              "value": "three-up"
+            },
+            {
               "name": "Intro (first link left, heading + lead line right)",
               "value": "intro"
             },
@@ -66,7 +74,10 @@
         "breadcrumb",
         "quote",
         "callout",
-        "newsletter"
+        "newsletter",
+        "embed",
+        "tags",
+        "share"
       ]
     }
   ]

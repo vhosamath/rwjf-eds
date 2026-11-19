@@ -108,6 +108,7 @@ export default function decorate(block) {
   heading?.classList.add('callout-title');
 
   // cta: first link of the cell; anything after it is the (optional) video dialog text
+  let figureVideo = null;
   if (ctaRow) {
     ctaRow.className = 'callout-cta';
     const cell = ctaRow.firstElementChild || ctaRow;
@@ -135,6 +136,15 @@ export default function decorate(block) {
       p.className = 'button-wrapper';
       p.append(button);
       cell.replaceChildren(p);
+    } else if (link && videoId && isFigure) {
+      // figure + YouTube link: the image becomes a play button that opens the video dialog
+      const title = heading?.textContent.trim() || contentRow?.textContent.trim();
+      figureVideo = {
+        link,
+        title,
+        dialog: buildVideoDialog(block, { videoId, title, textNodes: extra }),
+      };
+      ctaRow.remove();
     } else if (link) {
       extra.forEach((node) => node.remove());
       link.classList.add('button', 'primary');
@@ -156,6 +166,18 @@ export default function decorate(block) {
     const media = block.querySelector('.callout-media');
     const caption = block.querySelector('.callout-content');
     if (media) figure.append(media);
+    const picture = media?.querySelector('picture');
+    if (figureVideo && picture) {
+      const play = document.createElement('button');
+      play.type = 'button';
+      play.className = 'callout-video-play';
+      play.setAttribute('aria-haspopup', 'dialog');
+      play.setAttribute('aria-label', figureVideo.title ? `Play video: ${figureVideo.title}` : 'Play video');
+      moveInstrumentation(figureVideo.link, play);
+      picture.replaceWith(play);
+      play.append(picture);
+      play.addEventListener('click', () => figureVideo.dialog.open(play));
+    }
     if (caption) {
       const figcaption = document.createElement('figcaption');
       figcaption.className = 'callout-caption';

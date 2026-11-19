@@ -27,8 +27,12 @@
           "valueType": "string",
           "options": [
             {
-              "name": "Article header (no image, shows byline, content type, date and read time from page metadata)",
+              "name": "Article header (byline, content type, date and read time from page metadata; optional image with caption)",
               "value": "article"
+            },
+            {
+              "name": "Large byline (article header: byline at the title size; write \" | \" in the byline for a line break)",
+              "value": "byline-large"
             }
           ]
         },
@@ -52,6 +56,14 @@
           "value": "",
           "label": "Text",
           "valueType": "string"
+        },
+        {
+          "component": "richtext",
+          "name": "caption",
+          "value": "",
+          "label": "Image caption",
+          "valueType": "string",
+          "description": "Article header only: caption and photo credit shown under the image."
         }
       ]
     }

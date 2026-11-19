@@ -26,8 +26,100 @@
   font-weight: 700;
 }
 
+/* style "image": lavender quote box over a photo with caption (source: RWJF blockquote with image) */
+.quote.image {
+  --quote-box-color: #efdaf4;
+}
+
+.quote.image .quote-media {
+  margin: 0;
+}
+
+/* mobile: the photo runs to the right edge of the screen */
+.quote.image .quote-media picture {
+  display: block;
+  margin-right: calc(-1 * var(--content-padding));
+}
+
+.quote.image .quote-media img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+}
+
+.quote.image .quote-caption {
+  margin: 10px 0 16px;
+  font-size: var(--caption-font-size);
+  line-height: 1.3;
+}
+
+.quote.image .quote-caption p {
+  margin: 0;
+}
+
+.quote.image .quote-figure {
+  position: relative;
+  z-index: 1;
+  border-left: 0;
+  border-radius: 48px 0;
+  padding: 24px 32px 32px;
+  background-color: var(--quote-box-color);
+}
+
+.quote.image .quote-attribution {
+  margin-top: 32px;
+  font-family: var(--heading-font-family);
+  font-size: var(--heading-font-size-xs);
+  font-weight: var(--heading-font-weight);
+  line-height: 1;
+}
+
+.quote.image .quote-attribution p {
+  margin: 0;
+}
+
 @media (width >= 900px) {
   .quote .quote-figure {
     padding-left: 28px;
+  }
+
+  /*
+   * 1000px wide, centred: the photo starts 349px in and runs past the right edge of the block,
+   * the 563px quote box starts 320px below the top of the photo, the caption sits right of the box
+   */
+  .quote.image {
+    display: grid;
+    grid-template-columns: 34.9% 21.4% minmax(0, 1fr);
+
+    /* the last (flexible) row takes the part of the quote box that runs below the caption */
+    grid-template-rows: 320px auto auto 1fr;
+    max-width: 1000px;
+    margin-inline: auto;
+  }
+
+  .quote.image .quote-media {
+    display: contents;
+  }
+
+  .quote.image .quote-media picture {
+    grid-column: 2 / 4;
+    grid-row: 1 / 3;
+    margin-right: calc(-1 * max(0px, (100vw - var(--content-max-width)) / 2));
+  }
+
+  .quote.image .quote-caption {
+    grid-column: 3;
+    grid-row: 3;
+    margin: 10px 0 0;
+    padding-left: 59px;
+  }
+
+  .quote.image .quote-figure {
+    grid-column: 1 / 3;
+    grid-row: 2 / 5;
+    align-self: start;
+    border-radius: 64px 0;
+    padding: 40px 48px 48px;
   }
 }

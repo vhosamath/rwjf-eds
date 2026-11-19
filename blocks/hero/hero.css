@@ -115,6 +115,50 @@
   transform: translateY(-50%);
 }
 
+/* style "byline-large": the byline continues the title at the title size, one title line below it */
+.hero.article.byline-large .hero-byline {
+  margin-top: var(--heading-font-size-xl);
+  font-size: var(--heading-font-size-xl);
+  font-weight: var(--heading-font-weight);
+  line-height: var(--heading-line-height-xl);
+}
+
+/* optional article image with caption and credit, under the article info */
+.hero.article:has(.hero-figure) {
+  padding-bottom: 0;
+}
+
+/* without a breadcrumb above it, the article title starts 24px below the header, as on the source */
+.hero-container .hero-wrapper:first-child > .hero.article:has(.hero-figure) {
+  padding-top: 24px;
+}
+
+.hero.article .hero-figure {
+  margin: 48px 0 0;
+}
+
+.hero.article .hero-figure picture {
+  position: static;
+  z-index: auto;
+  display: block;
+}
+
+.hero.article .hero-figure img {
+  display: block;
+  aspect-ratio: 16 / 9;
+  height: auto;
+}
+
+.hero.article .hero-caption {
+  margin-top: 16px;
+  font-size: var(--caption-font-size);
+  line-height: 1.3;
+}
+
+.hero.article .hero-caption p {
+  margin: 0;
+}
+
 @media (width >= 900px) {
   .hero.article {
     padding: 48px 0 72px;
@@ -124,5 +168,11 @@
   .hero.article h1,
   .hero.article .hero-byline {
     max-width: 75%;
+  }
+
+  /* the source image is 1000px of the 1200px content width */
+  .hero.article .hero-figure {
+    max-width: calc(100% * 1000 / 1200);
+    margin-top: 64px;
   }
 }
