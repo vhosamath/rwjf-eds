@@ -197,6 +197,14 @@
             "value": "aside"
           },
           {
+            "name": "Aside, wide (last block in a half-width right rail)",
+            "value": "aside-wide"
+          },
+          {
+            "name": "Three up (blocks side by side in three columns)",
+            "value": "three-up"
+          },
+          {
             "name": "Intro (first link left, heading + lead line right)",
             "value": "intro"
           },
@@ -291,7 +299,7 @@
         "valueType": "string",
         "name": "cta_link",
         "label": "Link",
-        "description": "Page or URL. A YouTube link opens the video in a dialog."
+        "description": "Page or URL. A YouTube link opens the video in a dialog (in the Figure style the image becomes the play button)."
       },
       {
         "component": "text",
@@ -305,6 +313,28 @@
         "name": "cta_dialog",
         "label": "Video Dialog Text",
         "description": "Optional. Shown under the video when the link is a YouTube URL."
+      }
+    ]
+  },
+  {
+    "id": "cards",
+    "fields": [
+      {
+        "component": "select",
+        "name": "classes",
+        "label": "Style",
+        "valueType": "string",
+        "value": "",
+        "options": [
+          {
+            "name": "Default",
+            "value": ""
+          },
+          {
+            "name": "Teaser (linked cards: eyebrow, title link, description and tag pills)",
+            "value": "teaser"
+          }
+        ]
       }
     ]
   },
@@ -323,7 +353,16 @@
         "name": "text",
         "value": "",
         "label": "Text",
-        "valueType": "string"
+        "valueType": "string",
+        "description": "Teaser style: optional eyebrow paragraph, a heading with the card link, and a description."
+      },
+      {
+        "component": "richtext",
+        "name": "tags",
+        "value": "",
+        "label": "Tags",
+        "valueType": "string",
+        "description": "Teaser style: a list of topic links, shown as pills."
       }
     ]
   },
@@ -347,6 +386,33 @@
     ]
   },
   {
+    "id": "embed",
+    "fields": [
+      {
+        "component": "reference",
+        "valueType": "string",
+        "name": "embed_placeholder",
+        "label": "Placeholder image",
+        "multi": false,
+        "description": "Optional. With a placeholder the embed loads only when clicked (no third-party request before that)."
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "embed_placeholderAlt",
+        "label": "Placeholder alt text",
+        "value": ""
+      },
+      {
+        "component": "aem-content",
+        "valueType": "string",
+        "name": "embed_uri",
+        "label": "Embed URL",
+        "description": "YouTube, Vimeo, Twitter/X or Instagram post URL (other URLs are shown in an iframe)."
+      }
+    ]
+  },
+  {
     "id": "fragment",
     "fields": [
       {
@@ -366,8 +432,12 @@
         "valueType": "string",
         "options": [
           {
-            "name": "Article header (no image, shows byline, content type, date and read time from page metadata)",
+            "name": "Article header (byline, content type, date and read time from page metadata; optional image with caption)",
             "value": "article"
+          },
+          {
+            "name": "Large byline (article header: byline at the title size; write \" | \" in the byline for a line break)",
+            "value": "byline-large"
           }
         ]
       },
@@ -391,6 +461,14 @@
         "value": "",
         "label": "Text",
         "valueType": "string"
+      },
+      {
+        "component": "richtext",
+        "name": "caption",
+        "value": "",
+        "label": "Image caption",
+        "valueType": "string",
+        "description": "Article header only: caption and photo credit shown under the image."
       }
     ]
   },
@@ -447,6 +525,10 @@
           {
             "name": "Wide (breaks out of the article column)",
             "value": "wide"
+          },
+          {
+            "name": "With image (quote box over a photo, with caption)",
+            "value": "image"
           }
         ]
       },
@@ -457,10 +539,87 @@
         "label": "Quotation"
       },
       {
-        "component": "text",
+        "component": "richtext",
         "valueType": "string",
         "name": "attribution",
-        "label": "Attribution"
+        "label": "Attribution",
+        "description": "One paragraph per line, e.g. one line per person."
+      },
+      {
+        "component": "reference",
+        "valueType": "string",
+        "name": "media_image",
+        "label": "Image",
+        "multi": false,
+        "description": "Used by the \"With image\" style."
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "media_imageAlt",
+        "label": "Image alt text",
+        "value": ""
+      },
+      {
+        "component": "richtext",
+        "valueType": "string",
+        "name": "media_caption",
+        "label": "Image caption",
+        "description": "Caption and photo credit shown next to the quote box."
+      }
+    ]
+  },
+  {
+    "id": "share",
+    "fields": [
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "text",
+        "label": "Share message",
+        "description": "Optional. Text for X, LinkedIn and the email subject. Defaults to the page description."
+      },
+      {
+        "component": "multiselect",
+        "valueType": "string",
+        "name": "networks",
+        "label": "Networks",
+        "description": "Optional. Leave empty to show all.",
+        "options": [
+          {
+            "name": "X",
+            "value": "x"
+          },
+          {
+            "name": "Facebook",
+            "value": "facebook"
+          },
+          {
+            "name": "Email",
+            "value": "email"
+          },
+          {
+            "name": "LinkedIn",
+            "value": "linkedin"
+          },
+          {
+            "name": "Print",
+            "value": "print"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "tags",
+    "fields": [
+      {
+        "component": "richtext",
+        "name": "tags",
+        "value": "",
+        "label": "Tags",
+        "valueType": "string",
+        "description": "A list of topic links, shown as pills."
       }
     ]
   }

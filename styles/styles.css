@@ -517,3 +517,57 @@ main > .section.intro > .default-content-wrapper:first-child > p:first-child {
     grid-row: 2;
   }
 }
+
+/* section style "aside-wide": like "aside", with a half-width rail (source: 576px + 576px columns) */
+main > .section.aside-wide > div:last-child:not(.default-content-wrapper) {
+  margin-top: var(--section-spacing);
+}
+
+/* section style "three-up": the section's blocks sit side by side in three columns (stacked on mobile) */
+main > .section.three-up {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+@media (width >= 900px) {
+  main > .section.aside-wide,
+  main > .section.three-up {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: var(--column-gap);
+    box-sizing: border-box;
+    max-width: calc(var(--content-max-width) + 2 * var(--content-padding));
+    margin-inline: auto;
+    padding: 0 var(--content-padding);
+  }
+
+  main > .section.three-up {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    align-items: start;
+  }
+
+  main > .section.aside-wide > div:not(:last-child, .default-content-wrapper),
+  main > .section.aside-wide > .default-content-wrapper,
+  main > .section.three-up > div:not(.default-content-wrapper),
+  main > .section.three-up > .default-content-wrapper {
+    grid-column: auto;
+    max-width: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  main > .section.aside-wide > div:not(:last-child, .default-content-wrapper),
+  main > .section.aside-wide > .default-content-wrapper {
+    grid-column: 1;
+  }
+
+  main > .section.aside-wide > div:last-child:not(.default-content-wrapper) {
+    grid-column: 2;
+    grid-row: 1 / span 20;
+    align-self: start;
+    max-width: none;
+    margin: 0;
+    padding: 0;
+  }
+}

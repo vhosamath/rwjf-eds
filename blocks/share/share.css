@@ -1,0 +1,154 @@
+/* RWJF share bar (source: social-sharing): orange icons; "Share +" toggle on small screens */
+.share {
+  --share-color: #f26625;
+}
+
+.share nav {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.share .share-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  align-self: flex-start;
+  border: 0;
+  padding: 4px 0;
+  background: none;
+  color: var(--text-color);
+  font-family: var(--body-font-family);
+  font-size: var(--cta-link-font-size);
+  line-height: 22px;
+  cursor: pointer;
+}
+
+.share .share-toggle-icon::before {
+  content: '+';
+  font-size: 20px;
+}
+
+.share .share-toggle[aria-expanded='true'] .share-toggle-icon::before {
+  content: '−';
+}
+
+.share .share-list {
+  display: none;
+  flex-wrap: wrap;
+  margin: 0 0 0 -12px;
+  padding: 0;
+  list-style: none;
+}
+
+.share .share-toggle[aria-expanded='true'] + .share-list {
+  display: flex;
+}
+
+.share .share-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  padding: 0;
+  background: none;
+  color: var(--share-color);
+  cursor: pointer;
+}
+
+.share .share-link:hover,
+.share .share-link:focus-visible {
+  color: var(--color-navy);
+}
+
+.share .share-link:focus-visible {
+  outline: 2px solid var(--focus-ring-color);
+  outline-offset: -2px;
+}
+
+.share .share-icon {
+  display: block;
+  width: 24px;
+  height: 24px;
+  background-color: currentcolor;
+  mask: var(--share-icon) center / contain no-repeat;
+}
+
+.share .share-x .share-icon {
+  --share-icon: url('../../icons/share-x.svg');
+
+  width: 20px;
+  height: 21px;
+}
+
+.share .share-facebook .share-icon {
+  --share-icon: url('../../icons/share-facebook.svg');
+}
+
+.share .share-email .share-icon {
+  --share-icon: url('../../icons/share-mail.svg');
+}
+
+.share .share-linkedin .share-icon {
+  --share-icon: url('../../icons/share-linkedin.svg');
+}
+
+.share .share-print .share-icon {
+  --share-icon: url('../../icons/share-print.svg');
+}
+
+@media print {
+  main > .section.share-container {
+    display: none;
+  }
+}
+
+/* desktop: a vertical bar in the right margin that stays beside the article while scrolling */
+@media (width >= 1340px) {
+  /*
+   * the section is a track from its place to the end of the page content (height set by share.js),
+   * the bar sticks inside it; the negative bottom margin cancels the track's height and the next
+   * section's top margin, so the track takes no room
+   */
+  main > .section.share-container {
+    position: relative;
+    z-index: 2;
+    height: var(--share-track, 0);
+    margin: 0 0 calc(-1 * (var(--share-track, 0px) + var(--section-spacing)));
+    pointer-events: none;
+  }
+
+  main > .section.share-container > .share-wrapper {
+    height: 100%;
+    max-width: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .share .share-toggle {
+    display: none;
+  }
+
+  .share .share-list,
+  .share .share-toggle + .share-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin: 0;
+  }
+
+  .share .share-link {
+    width: 50px;
+    height: 30px;
+  }
+
+  main > .section.share-container .share {
+    position: sticky;
+    top: calc(var(--nav-height) + 24px);
+    width: 50px;
+    margin: 0 24px 0 auto;
+    pointer-events: auto;
+  }
+}

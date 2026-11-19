@@ -214,6 +214,92 @@
           ]
         }
       ]
+    },
+    {
+      "name": "annual-message-2026",
+      "description": "RWJF 2026 annual message (newer rwjf.org markup): article hero with image, share bar, right-rail figures/video/card, quote with photo, Instagram embeds, related cards, About fragment. Imported by tools/importer/import-annual-message-2026.js.",
+      "urls": [
+        "https://www.rwjf.org/en/about-rwjf/our-guiding-principles/annual-messages/answering-the-call-for-a-healthy-inclusive-democracy.html"
+      ],
+      "representativeUrl": "https://www.rwjf.org/en/about-rwjf/our-guiding-principles/annual-messages/answering-the-call-for-a-healthy-inclusive-democracy.html",
+      "urlPattern": "/en/about-rwjf/our-guiding-principles/annual-messages/answering-the-call-for-a-healthy-inclusive-democracy.html",
+      "importScript": "tools/importer/import-annual-message-2026.js",
+      "blocks": [
+        {
+          "name": "hero-article-image",
+          "variant": "Hero (article, byline-large)",
+          "instances": [
+            ".cmp-hero"
+          ]
+        },
+        {
+          "name": "share",
+          "variant": "Share",
+          "instances": [
+            ".social-sharing"
+          ]
+        },
+        {
+          "name": "callout-figure",
+          "variant": "Callout (figure)",
+          "instances": [
+            ".image > .cmp-image"
+          ]
+        },
+        {
+          "name": "callout-figure-video",
+          "variant": "Callout (figure) with YouTube link",
+          "instances": [
+            ".video"
+          ]
+        },
+        {
+          "name": "quote-image",
+          "variant": "Quote (wide, image)",
+          "instances": [
+            ".cmp-blockquote"
+          ]
+        },
+        {
+          "name": "embed-instagram",
+          "variant": "Embed (Instagram, with placeholder)",
+          "instances": [
+            ".embedinteractive"
+          ]
+        },
+        {
+          "name": "cards-teaser",
+          "variant": "Cards (teaser)",
+          "instances": [
+            ".card .cmp-customcard",
+            ".card-column-control"
+          ]
+        },
+        {
+          "name": "fragment",
+          "variant": "Fragment (/fragments/about-rwjf)",
+          "instances": [
+            ".cmp-text:has(.heading4-style)"
+          ]
+        }
+      ],
+      "sections": [
+        "hero",
+        "share",
+        "text",
+        "aside",
+        "text",
+        "quote",
+        "text",
+        "three-up",
+        "text",
+        "aside-wide",
+        "text",
+        "aside-wide",
+        "text",
+        "related",
+        "fragment"
+      ]
     }
   ]
 }
