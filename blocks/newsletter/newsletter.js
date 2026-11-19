@@ -141,17 +141,6 @@ function mockResponse(body) {
   });
 }
 
-async function csrfToken(endpointUrl) {
-  try {
-    const resp = await fetch(new URL('/libs/granite/csrf/token.json', endpointUrl), { credentials: 'omit' });
-    if (!resp.ok) return null;
-    const json = await resp.json();
-    return json.token || null;
-  } catch {
-    return null;
-  }
-}
-
 class RequestError extends Error {
   constructor(kind, response) {
     super(kind);
@@ -168,13 +157,15 @@ async function send(endpoint, body) {
   } catch {
     throw new RequestError('network');
   }
-  const headers = { Accept: 'application/json', 'Content-Type': 'application/json' };
-  const token = await csrfToken(url);
-  if (token) headers['CSRF-Token'] = token;
+  // CORS "simple request": POST + text/plain body and no other headers, so the browser sends no
+  // OPTIONS preflight; no cookies. The servlet path is excluded from the AEM CSRF filter.
   let resp;
   try {
     resp = await fetch(url, {
-      method: 'POST', headers, body: JSON.stringify(body), credentials: 'omit',
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=UTF-8' },
+      body: JSON.stringify(body),
+      credentials: 'omit',
     });
   } catch {
     throw new RequestError('network');
