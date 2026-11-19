@@ -289,7 +289,8 @@ export default function decorate(block) {
   block.textContent = '';
 
   const form = el('form', { className: 'newsletter-form', novalidate: true });
-  const status = el('div', { className: 'newsletter-status', role: 'status', 'aria-live': 'polite' });
+  // screen-reader announcements only (loading, step 2, errors)
+  const status = el('div', { className: 'newsletter-status visually-hidden', role: 'status', 'aria-live': 'polite' });
 
   // band: intro + step 1
   const headingId = nextId('heading');
@@ -365,9 +366,11 @@ export default function decorate(block) {
   block.append(form);
 
   /* helpers */
+  let announceTimer;
   const announce = (message) => {
+    clearTimeout(announceTimer);
     status.textContent = '';
-    setTimeout(() => { status.textContent = message; }, 50);
+    announceTimer = setTimeout(() => { status.textContent = message; }, 50);
   };
   const showFormError = (target, message) => {
     target.textContent = message;
@@ -376,18 +379,22 @@ export default function decorate(block) {
   };
   const checkedValues = (name) => [...form.querySelectorAll(`input[name="${name}"]:checked`)].map((i) => i.value);
   const radioValue = (name) => form.querySelector(`input[name="${name}"]:checked`)?.value || '';
+  // the result replaces the whole band content (heading, intro and form); focus moves to it, so
+  // screen readers read it once and it is not repeated in the status region
   const showResult = (heading, message) => {
     const result = el(
       'div',
       { className: 'newsletter-result', tabindex: '-1' },
-      el('h3', { text: heading }),
+      el('h2', { id: headingId, text: heading }),
       message ? el('p', { text: message }) : null,
     );
-    step1.replaceWith(result);
-    step2.remove();
+    band.replaceChildren(result);
     band.classList.remove('is-expanded');
+    band.classList.add('has-result');
+    step2.remove();
+    clearTimeout(announceTimer);
+    status.textContent = '';
     result.focus();
-    announce([heading, message].filter(Boolean).join('. '));
   };
 
   /* reCAPTCHA only after the visitor shows intent */

@@ -29,7 +29,8 @@
   border-radius: 64px 64px 0 0;
 }
 
-.newsletter .newsletter-intro h2 {
+.newsletter .newsletter-intro h2,
+.newsletter .newsletter-result h2 {
   margin-top: 16px;
   font-family: var(--heading-font-family);
   font-size: var(--heading-font-size-xl);
@@ -312,14 +313,7 @@
   flex-basis: 100%;
 }
 
-/* result */
-.newsletter .newsletter-result h3 {
-  font-family: var(--heading-font-family);
-  font-size: var(--heading-font-size-l);
-  font-weight: 500;
-  line-height: 1;
-}
-
+/* result (replaces the band content) */
 .newsletter .newsletter-result p {
   margin-top: 16px;
   font-size: var(--body-font-size-m);
@@ -342,8 +336,13 @@
     border-radius: 88px 88px 0 0;
   }
 
+  .newsletter .newsletter-band.has-result {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
   /* the source band heading is 54px (between the H1 and H2 sizes) */
-  .newsletter .newsletter-intro h2 {
+  .newsletter .newsletter-intro h2,
+  .newsletter .newsletter-result h2 {
     font-size: 54px;
     line-height: 0.95;
   }
