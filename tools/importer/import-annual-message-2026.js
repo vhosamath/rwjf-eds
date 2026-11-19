@@ -97,6 +97,24 @@ function textNode(document, child, state) {
 
 /* ------------------------------------------------------------------ blocks */
 
+// The source page has no breadcrumb; the migrated page gets the same trail as the 2015 message
+// (parent pages link to www.rwjf.org until they are migrated; the last item is this page)
+const BREADCRUMB = [
+  ['About RWJF', 'https://www.rwjf.org/en/about-rwjf.html'],
+  ['Our Guiding Principles', 'https://www.rwjf.org/en/about-rwjf/our-guiding-principles.html'],
+  ['Annual Messages', 'https://www.rwjf.org/en/about-rwjf/our-guiding-principles/annual-messages.html'],
+];
+
+function breadcrumbBlock(document, title) {
+  const items = BREADCRUMB.map(([text, href]) => {
+    const a = el(document, 'a', text);
+    a.setAttribute('href', href);
+    return el(document, 'li', a);
+  });
+  const ol = el(document, 'ol', ...items, el(document, 'li', title));
+  return WebImporter.Blocks.createBlock(document, { name: 'Breadcrumb', cells: [[frag(document, hint(document, 'items'), ol)]] });
+}
+
 function heroBlock(document, hero) {
   const h1 = clean(hero.querySelector('h1')?.textContent);
   const img = hero.querySelector('.cmp-hero__image--primary img');
@@ -314,7 +332,8 @@ export default {
     const { items, about } = collectItems(document, content);
 
     const main = document.createElement('div');
-    const sections = [{ style: null, nodes: [heroBlock(document, hero)] }, { style: null, nodes: [shareBlock(document)] }, ...buildSections(items)];
+    const title = clean(hero.querySelector('h1')?.textContent);
+    const sections = [{ style: null, nodes: [breadcrumbBlock(document, title), heroBlock(document, hero)] }, { style: null, nodes: [shareBlock(document)] }, ...buildSections(items)];
     sections.forEach((section, i) => {
       if (i) main.append(document.createElement('hr'));
       main.append(...section.nodes);
