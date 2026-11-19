@@ -97,13 +97,40 @@ function textNode(document, child, state) {
 
 /* ------------------------------------------------------------------ blocks */
 
+// The source page has no breadcrumb; the migrated page gets the same trail as the 2015 message
+// (parent pages link to www.rwjf.org until they are migrated; the last item is this page)
+const BREADCRUMB = [
+  ['About RWJF', 'https://www.rwjf.org/en/about-rwjf.html'],
+  ['Our Guiding Principles', 'https://www.rwjf.org/en/about-rwjf/our-guiding-principles.html'],
+  ['Annual Messages', 'https://www.rwjf.org/en/about-rwjf/our-guiding-principles/annual-messages.html'],
+];
+
+function breadcrumbBlock(document, title) {
+  const items = BREADCRUMB.map(([text, href]) => {
+    const a = el(document, 'a', text);
+    a.setAttribute('href', href);
+    return el(document, 'li', a);
+  });
+  const ol = el(document, 'ol', ...items, el(document, 'li', title));
+  return WebImporter.Blocks.createBlock(document, { name: 'Breadcrumb', cells: [[frag(document, hint(document, 'items'), ol)]] });
+}
+
 function heroBlock(document, hero) {
   const h1 = clean(hero.querySelector('h1')?.textContent);
   const img = hero.querySelector('.cmp-hero__image--primary img');
   const caption = hero.querySelector('.cmp-hero__caption .cmp-image__title p, .cmp-hero__image--primary .cmp-image__title p');
+  // byline field (text_byline, same cell as the title so both are edited in place): the second
+  // line of the source title block, keeping its line break
+  const bylineSrc = [...hero.querySelectorAll('.cmp-hero__content-headings-heading p')].find((p) => clean(p.textContent));
+  const bylineLines = bylineSrc ? bylineSrc.innerHTML.split(/<br\s*\/?>/i).map((l) => clean(l.replace(/<[^>]+>/g, ''))).filter(Boolean) : [];
+  const byline = bylineLines.length ? el(document, 'p') : null;
+  bylineLines.forEach((line, i) => {
+    if (i) byline.append(document.createElement('br'));
+    byline.append(line);
+  });
   const cells = [
     [img ? frag(document, hint(document, 'image'), image(document, img.getAttribute('src'), img.getAttribute('alt'))) : ''],
-    [frag(document, hint(document, 'text'), el(document, 'h1', h1))],
+    [frag(document, hint(document, 'text'), el(document, 'h1', h1), byline ? hint(document, 'text_byline') : null, byline)],
     [caption ? frag(document, hint(document, 'caption'), copyInline(document, caption)) : ''],
   ];
   return WebImporter.Blocks.createBlock(document, { name: 'Hero (article, byline-large)', cells });
@@ -314,7 +341,8 @@ export default {
     const { items, about } = collectItems(document, content);
 
     const main = document.createElement('div');
-    const sections = [{ style: null, nodes: [heroBlock(document, hero)] }, { style: null, nodes: [shareBlock(document)] }, ...buildSections(items)];
+    const title = clean(hero.querySelector('h1')?.textContent);
+    const sections = [{ style: null, nodes: [breadcrumbBlock(document, title), heroBlock(document, hero)] }, { style: null, nodes: [shareBlock(document)] }, ...buildSections(items)];
     sections.forEach((section, i) => {
       if (i) main.append(document.createElement('hr'));
       main.append(...section.nodes);
