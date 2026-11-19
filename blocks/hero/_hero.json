@@ -27,11 +27,11 @@
           "valueType": "string",
           "options": [
             {
-              "name": "Article header (byline, content type, date and read time from page metadata; optional image with caption)",
+              "name": "Article header (byline from this field or the page properties; content type, date and read time from the page properties; optional image with caption)",
               "value": "article"
             },
             {
-              "name": "Large byline (article header: byline at the title size; write \" | \" in the byline for a line break)",
+              "name": "Large byline (article header: byline at the title size)",
               "value": "byline-large"
             }
           ]
@@ -56,6 +56,14 @@
           "value": "",
           "label": "Text",
           "valueType": "string"
+        },
+        {
+          "component": "richtext",
+          "name": "text_byline",
+          "value": "",
+          "label": "Byline",
+          "valueType": "string",
+          "description": "Article header only: shown under the title. Leave empty to use the page's byline property."
         },
         {
           "component": "richtext",

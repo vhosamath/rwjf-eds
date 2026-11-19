@@ -61,11 +61,17 @@
   line-height: var(--heading-line-height-xl);
 }
 
+/* byline: the hero's byline field (in the title cell) or the page property (in .hero-meta) */
 .hero.article .hero-byline {
   margin: 24px 0 0;
   font-family: var(--heading-font-family);
   font-size: var(--byline-font-size);
   line-height: 1.1;
+}
+
+/* one paragraph per line (a typed line break or a new paragraph look the same) */
+.hero.article .hero-byline p {
+  margin: 0;
 }
 
 .hero.article .hero-info {

@@ -52,53 +52,123 @@ function buildArticleFigure(block) {
   return figure;
 }
 
-function decorateArticle(block) {
-  const figure = buildArticleFigure(block);
+/**
+ * The byline typed in the hero (field `text_byline`, in the same cell as the title).
+ * On the author its paragraphs carry the field's editor attributes (grouped in a wrapper by
+ * editor-support-rte.js, or not yet); on the published page they are the elements after the title.
+ * The paragraphs are kept in place (so they stay editable) and get a `hero-byline` wrapper.
+ * @param {Element} textCell
+ * @param {Element|null} heading
+ * @returns {Element|null}
+ */
+function decorateBylineField(textCell, heading) {
+  if (!textCell) return null;
+  const group = textCell.querySelector(':scope > [data-aue-prop="text_byline"]');
+  if (group) {
+    group.classList.add('hero-byline');
+    return group;
+  }
+  let nodes = [...textCell.querySelectorAll(':scope > [data-richtext-prop="text_byline"]')];
+  if (!nodes.length && heading && !textCell.querySelector('[data-aue-prop], [data-richtext-prop]')) {
+    nodes = [];
+    let next = heading.nextElementSibling;
+    while (next) {
+      if (next.textContent.trim() && !next.querySelector('a.hero-download, a[href$=".pdf"]')) nodes.push(next);
+      next = next.nextElementSibling;
+    }
+  }
+  if (!nodes.length) return null;
+  const wrapper = document.createElement('div');
+  wrapper.className = 'hero-byline';
+  nodes[0].before(wrapper);
+  wrapper.append(...nodes);
+  return wrapper;
+}
 
-  // the image and caption rows are optional for the article variant: drop them when empty
-  [...block.children].forEach((row) => {
-    if (!row.textContent.trim() && !row.querySelector('picture, img')) row.classList.add('hero-empty');
+/** byline from the page properties (" | " is a line break) */
+function buildBylineFromPage(byline) {
+  const wrapper = document.createElement('div');
+  wrapper.className = 'hero-byline';
+  const p = document.createElement('p');
+  byline.split(/\s+\|\s+/).forEach((line, i) => {
+    if (i) p.append(document.createElement('br'));
+    p.append(line);
+  });
+  wrapper.append(p);
+  return wrapper;
+}
+
+/**
+ * On the author, values that come from the page properties open the page properties when clicked
+ * (Universal Editor selects the page's jcr:content with the page-metadata model).
+ * @param {Element} block
+ * @param {Element} element
+ */
+function instrumentAsPage(block, element) {
+  const resource = block.dataset.aueResource || block.closest('[data-aue-resource]')?.dataset.aueResource;
+  const page = resource && /^(urn:aemconnection:.+?\/jcr:content)(\/|$)/.exec(resource)?.[1];
+  if (!page) return;
+  element.dataset.aueResource = page;
+  element.dataset.aueType = 'component';
+  element.dataset.aueModel = 'page-metadata';
+  element.dataset.aueLabel = 'Page properties';
+}
+
+function row(className, ...children) {
+  const div = document.createElement('div');
+  div.className = className;
+  div.append(...children);
+  return div;
+}
+
+/**
+ * Article header. The title cell keeps only what the author typed (title + byline field), so both
+ * can be edited in place; the page-property byline, the info line and the image + caption are
+ * rows of their own after it.
+ * @param {Element} block
+ */
+function decorateArticle(block) {
+  const [, textRow] = [...block.children];
+  const textCell = textRow?.firstElementChild;
+  const figure = buildArticleFigure(block);
+  const heading = block.querySelector('h1, h2');
+  const bylineField = decorateBylineField(textCell, heading);
+
+  // the image, caption and other empty rows are optional for the article variant: hide them
+  [...block.children].forEach((r) => {
+    if (!r.textContent.trim() && !r.querySelector('picture, img')) r.classList.add('hero-empty');
   });
 
-  const heading = block.querySelector('h1, h2');
-  const byline = getMetadata('byline');
+  const pageByline = !bylineField && getMetadata('byline');
   const info = [
     ['content-type', getMetadata('content-type')],
     ['date', formatDate(getMetadata('publication-date'))],
     ['read-time', formatReadTime(getMetadata('read-time'))],
   ].filter(([, value]) => value);
 
-  const fragment = document.createDocumentFragment();
-  if (byline) {
-    const p = document.createElement('p');
-    p.className = 'hero-byline';
-    // " | " in the byline is a line break ("A Message from … | RWJF President and CEO")
-    const lines = byline.split(/\s+\|\s+/);
-    if (lines.length > 1) {
-      lines.forEach((line, i) => {
-        if (i) p.append(document.createElement('br'));
-        p.append(line);
+  const rows = [];
+  if (pageByline || info.length) {
+    const meta = row('hero-meta');
+    if (pageByline) meta.append(buildBylineFromPage(pageByline));
+    if (info.length) {
+      const p = document.createElement('p');
+      p.className = 'hero-info';
+      info.forEach(([type, value]) => {
+        const span = document.createElement('span');
+        span.className = `hero-info-${type}`;
+        span.textContent = value;
+        p.append(span);
       });
-    } else {
-      p.textContent = byline;
+      meta.append(p);
     }
-    fragment.append(p);
+    instrumentAsPage(block, meta);
+    rows.push(meta);
   }
-  if (info.length) {
-    const p = document.createElement('p');
-    p.className = 'hero-info';
-    info.forEach(([type, value]) => {
-      const span = document.createElement('span');
-      span.className = `hero-info-${type}`;
-      span.textContent = value;
-      p.append(span);
-    });
-    fragment.append(p);
-  }
-  if (figure) fragment.append(figure);
+  if (figure) rows.push(row('hero-media', figure));
 
-  if (heading) heading.after(fragment);
-  else (block.children[1] || block.lastElementChild)?.prepend(fragment);
+  const anchor = textRow && !textRow.classList.contains('hero-empty') ? textRow : null;
+  if (anchor) anchor.after(...rows);
+  else block.append(...rows);
 
   block.querySelectorAll('a[href]').forEach((a) => {
     if (/\.pdf($|\?)/i.test(a.getAttribute('href'))) a.classList.add('hero-download');
