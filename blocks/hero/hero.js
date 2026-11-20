@@ -53,36 +53,17 @@ function buildArticleFigure(block) {
 }
 
 /**
- * The byline typed in the hero (field `text_byline`, in the same cell as the title).
- * On the author its paragraphs carry the field's editor attributes (grouped in a wrapper by
- * editor-support-rte.js, or not yet); on the published page they are the elements after the title.
- * The paragraphs are kept in place (so they stay editable) and get a `hero-byline` wrapper.
- * @param {Element} textCell
- * @param {Element|null} heading
- * @returns {Element|null}
+ * The byline typed in the hero (field `byline`, row 4). Its cell keeps the field's editor
+ * attributes, so it stays editable in place; it gets the `hero-byline` class.
+ * @param {Element} bylineRow
+ * @returns {Element|null} the byline row, or null when the field is empty
  */
-function decorateBylineField(textCell, heading) {
-  if (!textCell) return null;
-  const group = textCell.querySelector(':scope > [data-aue-prop="text_byline"]');
-  if (group) {
-    group.classList.add('hero-byline');
-    return group;
-  }
-  let nodes = [...textCell.querySelectorAll(':scope > [data-richtext-prop="text_byline"]')];
-  if (!nodes.length && heading && !textCell.querySelector('[data-aue-prop], [data-richtext-prop]')) {
-    nodes = [];
-    let next = heading.nextElementSibling;
-    while (next) {
-      if (next.textContent.trim() && !next.querySelector('a.hero-download, a[href$=".pdf"]')) nodes.push(next);
-      next = next.nextElementSibling;
-    }
-  }
-  if (!nodes.length) return null;
-  const wrapper = document.createElement('div');
-  wrapper.className = 'hero-byline';
-  nodes[0].before(wrapper);
-  wrapper.append(...nodes);
-  return wrapper;
+function decorateBylineField(bylineRow) {
+  const cell = bylineRow?.firstElementChild;
+  if (!cell || !cell.textContent.trim()) return null;
+  cell.classList.add('hero-byline');
+  bylineRow.classList.add('hero-byline-row');
+  return bylineRow;
 }
 
 /** byline from the page properties (" | " is a line break) */
@@ -122,17 +103,16 @@ function row(className, ...children) {
 }
 
 /**
- * Article header. The title cell keeps only what the author typed (title + byline field), so both
- * can be edited in place; the page-property byline, the info line and the image + caption are
- * rows of their own after it.
+ * Article header. Rows: image, title, caption, byline. The title and byline cells keep only what
+ * the author typed, so they can be edited in place; the byline row moves under the title, then
+ * come the info line (with the page-property byline when the field is empty) and the image +
+ * caption as rows of their own.
  * @param {Element} block
  */
 function decorateArticle(block) {
-  const [, textRow] = [...block.children];
-  const textCell = textRow?.firstElementChild;
+  const [, textRow, , bylineRow] = [...block.children];
   const figure = buildArticleFigure(block);
-  const heading = block.querySelector('h1, h2');
-  const bylineField = decorateBylineField(textCell, heading);
+  const bylineField = decorateBylineField(bylineRow);
 
   // the image, caption and other empty rows are optional for the article variant: hide them
   [...block.children].forEach((r) => {
@@ -146,7 +126,7 @@ function decorateArticle(block) {
     ['read-time', formatReadTime(getMetadata('read-time'))],
   ].filter(([, value]) => value);
 
-  const rows = [];
+  const rows = bylineField ? [bylineField] : [];
   if (pageByline || info.length) {
     const meta = row('hero-meta');
     if (pageByline) meta.append(buildBylineFromPage(pageByline));

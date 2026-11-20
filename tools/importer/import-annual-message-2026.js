@@ -119,8 +119,8 @@ function heroBlock(document, hero) {
   const h1 = clean(hero.querySelector('h1')?.textContent);
   const img = hero.querySelector('.cmp-hero__image--primary img');
   const caption = hero.querySelector('.cmp-hero__caption .cmp-image__title p, .cmp-hero__image--primary .cmp-image__title p');
-  // byline field (text_byline, same cell as the title so both are edited in place): the second
-  // line of the source title block, keeping its line break
+  // byline field (its own cell, after the caption; edited in place): the second line of the
+  // source title block, keeping its line break
   const bylineSrc = [...hero.querySelectorAll('.cmp-hero__content-headings-heading p')].find((p) => clean(p.textContent));
   const bylineLines = bylineSrc ? bylineSrc.innerHTML.split(/<br\s*\/?>/i).map((l) => clean(l.replace(/<[^>]+>/g, ''))).filter(Boolean) : [];
   const byline = bylineLines.length ? el(document, 'p') : null;
@@ -130,8 +130,9 @@ function heroBlock(document, hero) {
   });
   const cells = [
     [img ? frag(document, hint(document, 'image'), image(document, img.getAttribute('src'), img.getAttribute('alt'))) : ''],
-    [frag(document, hint(document, 'text'), el(document, 'h1', h1), byline ? hint(document, 'text_byline') : null, byline)],
+    [frag(document, hint(document, 'text'), el(document, 'h1', h1))],
     [caption ? frag(document, hint(document, 'caption'), copyInline(document, caption)) : ''],
+    [byline ? frag(document, hint(document, 'byline'), byline) : ''],
   ];
   return WebImporter.Blocks.createBlock(document, { name: 'Hero (article, byline-large)', cells });
 }

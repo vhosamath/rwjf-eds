@@ -464,19 +464,19 @@
       },
       {
         "component": "richtext",
-        "name": "text_byline",
-        "value": "",
-        "label": "Byline",
-        "valueType": "string",
-        "description": "Article header only: shown under the title. Leave empty to use the page's byline property."
-      },
-      {
-        "component": "richtext",
         "name": "caption",
         "value": "",
         "label": "Image caption",
         "valueType": "string",
         "description": "Article header only: caption and photo credit shown under the image."
+      },
+      {
+        "component": "richtext",
+        "name": "byline",
+        "value": "",
+        "label": "Byline",
+        "valueType": "string",
+        "description": "Article header only: shown under the title. Leave empty to use the page's byline property."
       }
     ]
   },
