@@ -25,8 +25,50 @@
         "component": "aem-tag",
         "valueType": "string",
         "name": "cq:tags",
-        "label": "Tags",
-        "description": "AEM tags for this page (Tools > Tagging). Output as the cq-tags page metadata (tag IDs)."
+        "label": "Other Tags",
+        "description": "Tags outside the RWJF taxonomy categories below. Output as cq-tags page metadata (tag IDs)."
+      },
+      {
+        "component": "aem-tag",
+        "valueType": "string",
+        "name": "tags-content-type",
+        "label": "Content Type",
+        "description": "Pick tags from the content-type namespace. Stored as tag IDs; shown on the site by title."
+      },
+      {
+        "component": "aem-tag",
+        "valueType": "string",
+        "name": "tags-authors",
+        "label": "Author/Contributor",
+        "description": "Pick tags from the authors namespace. Stored as tag IDs; shown on the site by title."
+      },
+      {
+        "component": "aem-tag",
+        "valueType": "string",
+        "name": "tags-topics",
+        "label": "Topics",
+        "description": "Pick tags from the page-topics namespace. Stored as tag IDs; shown on the site by title."
+      },
+      {
+        "component": "aem-tag",
+        "valueType": "string",
+        "name": "tags-health-factors",
+        "label": "Health Factors",
+        "description": "Pick tags from the health-factors namespace. Stored as tag IDs; shown on the site by title."
+      },
+      {
+        "component": "aem-tag",
+        "valueType": "string",
+        "name": "tags-systems",
+        "label": "Systems",
+        "description": "Pick tags from the systems namespace. Stored as tag IDs; shown on the site by title."
+      },
+      {
+        "component": "aem-tag",
+        "valueType": "string",
+        "name": "tags-initiatives",
+        "label": "Initiatives",
+        "description": "Pick tags from the initiatives namespace. Stored as tag IDs; shown on the site by title."
       },
       {
         "component": "select",
