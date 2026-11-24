@@ -41,7 +41,8 @@
           "valueType": "string",
           "name": "tags-authors",
           "label": "Author/Contributor",
-          "description": "Pick tags from the authors namespace. Stored as tag IDs; shown on the site by title."
+          "description": "Pick tags from the authors namespace. Stored as tag IDs; shown on the site by title.",
+          "rootPath": "/content/cq:tags/authors"
         },
         {
           "component": "aem-tag",
@@ -62,7 +63,10 @@
           "valueType": "string",
           "name": "tags-systems",
           "label": "Systems",
-          "description": "Pick tags from the systems namespace. Stored as tag IDs; shown on the site by title."
+          "description": "Pick tags from the systems namespace. Stored as tag IDs; shown on the site by title.",
+          "validation": {
+            "rootPath": "/content/cq:tags/systems"
+          }
         },
         {
           "component": "aem-tag",
