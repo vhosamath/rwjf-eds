@@ -33,14 +33,15 @@
         "valueType": "string",
         "name": "tags-content-type",
         "label": "Content Type",
-        "description": "Pick tags from the content-type namespace. Stored as tag IDs; shown on the site by title."
+        "description": "Tags from the content-type namespace only. Stored as tag IDs; shown on the site by title.",
+        "rootPath": "/content/cq:tags/content-type"
       },
       {
         "component": "aem-tag",
         "valueType": "string",
         "name": "tags-authors",
         "label": "Author/Contributor",
-        "description": "Pick tags from the authors namespace. Stored as tag IDs; shown on the site by title.",
+        "description": "Tags from the authors namespace only. Stored as tag IDs; shown on the site by title.",
         "rootPath": "/content/cq:tags/authors"
       },
       {
@@ -48,31 +49,32 @@
         "valueType": "string",
         "name": "tags-topics",
         "label": "Topics",
-        "description": "Pick tags from the page-topics namespace. Stored as tag IDs; shown on the site by title."
+        "description": "Tags from the page-topics namespace only. Stored as tag IDs; shown on the site by title.",
+        "rootPath": "/content/cq:tags/page-topics"
       },
       {
         "component": "aem-tag",
         "valueType": "string",
         "name": "tags-health-factors",
         "label": "Health Factors",
-        "description": "Pick tags from the health-factors namespace. Stored as tag IDs; shown on the site by title."
+        "description": "Tags from the health-factors namespace only. Stored as tag IDs; shown on the site by title.",
+        "rootPath": "/content/cq:tags/health-factors"
       },
       {
         "component": "aem-tag",
         "valueType": "string",
         "name": "tags-systems",
         "label": "Systems",
-        "description": "Pick tags from the systems namespace. Stored as tag IDs; shown on the site by title.",
-        "validation": {
-          "rootPath": "/content/cq:tags/systems"
-        }
+        "description": "Tags from the systems namespace only. Stored as tag IDs; shown on the site by title.",
+        "rootPath": "/content/cq:tags/systems"
       },
       {
         "component": "aem-tag",
         "valueType": "string",
         "name": "tags-initiatives",
         "label": "Initiatives",
-        "description": "Pick tags from the initiatives namespace. Stored as tag IDs; shown on the site by title."
+        "description": "Tags from the initiatives namespace only. Stored as tag IDs; shown on the site by title.",
+        "rootPath": "/content/cq:tags/initiatives"
       },
       {
         "component": "select",
